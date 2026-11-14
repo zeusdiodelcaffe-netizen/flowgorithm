@@ -1,0 +1,2546 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Flowgorithm">
+<title>Flowgorithm Mobile</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpolygon points='8,1 15,8 8,15 1,8' fill='%23ffdd75' stroke='%23c8901c'/%3E%3C/svg%3E">
+<style>
+/* ============================================================
+   Flowgorithm Web — Versione Mobile / iPhone
+   ============================================================ */
+:root{
+  --bg:#eef2f6; --panel:#f7f9fb; --line:#dde5ec; --ink:#1c2b36; --muted:#5b6b7a;
+  --accent:#0f6ea8; --green:#1e8e3e; --red:#c5221f; --amber:#b26a00;
+  --console-bg:#141a24; --console-ink:#d7e3f0;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{height:100%; height:100dvh; overscroll-behavior:none;}
+body{
+  margin:0;
+  font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  padding-top:var(--safe-top);
+}
+button, input, select, textarea{font:inherit;}
+
+/* ---------- Barra superiore compatta per iPhone ---------- */
+#toolbar{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  min-height:52px;
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  flex:0 0 auto;
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+}
+#toolbar::-webkit-scrollbar{display:none;}
+.brand{display:flex;align-items:center;gap:7px;margin-right:2px;white-space:nowrap;flex:0 0 auto;}
+.brand svg{display:block;width:22px;height:22px;}
+.brand-t{display:flex;flex-direction:column;line-height:1.05;}
+.brand-t b{font-size:14px;letter-spacing:-.2px;}
+.brand-t span{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:1.1px;text-transform:uppercase;}
+
+.tb-sep{width:1px;height:24px;background:var(--line);flex:0 0 auto;margin:0 2px;}
+.tb-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  height:36px;padding:0 12px;
+  border:1px solid var(--line);background:#fff;border-radius:10px;
+  color:var(--ink);font-size:13px;font-weight:600;cursor:pointer;
+  white-space:nowrap;flex:0 0 auto;
+  transition:transform .08s ease, background .15s;
+}
+.tb-btn:active:not(:disabled){transform:scale(0.96);background:#eef2f6;}
+.tb-btn:disabled{opacity:.42;cursor:not-allowed;}
+.tb-btn.primary{background:var(--green);border-color:var(--green);color:#fff;}
+.tb-btn.primary:active:not(:disabled){background:#166d2f;}
+.tb-btn.danger{color:var(--red);border-color:#f3c2bf;background:#fff8f8;}
+.tb-btn.icon-only{padding:0 10px;}
+.tb-btn svg{flex:0 0 auto;}
+
+#stPill{
+  font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;
+  border:1px solid transparent;white-space:nowrap;flex:0 0 auto;margin-left:auto;
+}
+#stPill.st-idle{background:#eef2f6;color:var(--muted);}
+#stPill.st-running{background:#e6f4ea;color:var(--green);border-color:#b6dfc2;}
+#stPill.st-paused{background:#fef7e0;color:var(--amber);border-color:#f2dda6;}
+#stPill.st-waiting{background:#e8f0fe;color:#1a56c4;border-color:#c3d7f7;}
+#stPill.st-done{background:#e6f4ea;color:var(--green);border-color:#b6dfc2;}
+#stPill.st-error{background:#fdeceb;color:var(--red);border-color:#f3c2bf;}
+
+/* ---------- Barra secondaria (Velocità e Strumenti) ---------- */
+#subbar{
+  display:flex;align-items:center;gap:8px;padding:6px 12px;
+  background:#fafcfd;border-bottom:1px solid var(--line);
+  flex:0 0 auto;overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+#subbar::-webkit-scrollbar{display:none;}
+.speed-box{
+  display:flex;align-items:center;gap:6px;color:var(--muted);
+  background:#fff;border:1px solid var(--line);border-radius:8px;
+  padding:4px 10px;height:32px;flex:0 0 auto;
+}
+#speedRange{width:76px;accent-color:var(--accent);margin:0;}
+#speedLabel{font-size:11.5px;font-weight:600;color:var(--ink);min-width:62px;}
+.sub-btn{
+  height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--line);
+  background:#fff;color:var(--ink);font-size:12px;font-weight:600;
+  display:inline-flex;align-items:center;gap:5px;white-space:nowrap;flex:0 0 auto;
+}
+.sub-btn:active{background:#eef2f6;}
+
+/* ---------- Area principale a schede su mobile ---------- */
+#app{flex:1 1 auto;display:flex;position:relative;min-height:0;overflow:hidden;}
+
+#canvasWrap{
+  flex:1 1 auto;position:relative;overflow:hidden;background-color:#fbfdff;
+  background-image:linear-gradient(#e7edf3 1px,transparent 1px),linear-gradient(90deg,#e7edf3 1px,transparent 1px);
+  background-size:22px 22px;
+  touch-action:none;user-select:none;-webkit-user-select:none;
+}
+#canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
+
+#hintBar{
+  position:absolute;left:12px;right:12px;top:10px;
+  background:rgba(22,32,43,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  color:#f0f4f8;font-size:11.5px;padding:6px 12px;border-radius:10px;
+  pointer-events:none;text-align:center;line-height:1.3;
+}
+
+#zoomBox{
+  position:absolute;right:12px;bottom:16px;
+  display:flex;flex-direction:column;gap:8px;z-index:10;
+}
+#zoomBox button{
+  width:42px;height:42px;border-radius:12px;border:1px solid var(--line);
+  background:rgba(255,255,255,.94);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+  font-size:20px;font-weight:700;color:var(--ink);
+  display:flex;align-items:center;justify-content:center;padding:0;
+}
+#zoomBox button:active{background:#eef2f6;transform:scale(0.95);}
+
+/* Barra azioni rapide quando un blocco è selezionato */
+#nodeActionBar{
+  position:absolute;left:12px;bottom:16px;right:66px;
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  box-shadow:0 6px 20px rgba(15,30,45,.16);
+  padding:8px 10px;display:flex;align-items:center;gap:8px;z-index:12;
+  animation:slideUp .16s ease-out;
+}
+#nodeActionBar[hidden]{display:none;}
+@keyframes slideUp{from{transform:translateY(14px);opacity:0;}to{transform:none;opacity:1;}}
+#nabTitle{
+  flex:1 1 auto;font-size:12.5px;font-weight:700;color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:4px;
+}
+.nab-btn{
+  height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--line);
+  background:#f4f7fa;color:var(--ink);font-size:12.5px;font-weight:600;
+  display:inline-flex;align-items:center;gap:5px;flex:0 0 auto;
+}
+.nab-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.nab-btn.danger{background:#fdeceb;border-color:#f3c2bf;color:var(--red);}
+
+/* ---------- Pannelli Console e Variabili ---------- */
+.mobile-view{
+  position:absolute;inset:0;display:none;flex-direction:column;background:var(--panel);z-index:20;
+}
+.mobile-view.active{display:flex;}
+
+#consoleView{background:var(--console-bg);}
+.panel-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;
+  font-size:12px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);
+  border-bottom:1px solid var(--line);flex:0 0 auto;
+}
+#consoleView .panel-head{color:#8fa2b8;border-bottom:1px solid #232d3b;}
+.mini-btn{
+  border:1px solid var(--line);background:#fff;border-radius:8px;font-size:12px;font-weight:600;
+  color:var(--muted);padding:5px 11px;
+}
+#consoleView .mini-btn{background:transparent;border-color:#37455a;color:#8fa2b8;}
+
+#watchScroll{overflow-y:auto;flex:1 1 auto;-webkit-overflow-scrolling:touch;}
+#watchTable{width:100%;border-collapse:collapse;font-size:14px;}
+#watchTable th{
+  position:sticky;top:0;background:var(--panel);text-align:left;font-size:11px;
+  text-transform:uppercase;letter-spacing:.7px;color:var(--muted);padding:10px 14px;
+  border-bottom:1px solid var(--line);z-index:1;
+}
+#watchTable td{padding:10px 14px;border-bottom:1px solid #edf1f5;vertical-align:top;}
+#watchTable td.w-name{font-weight:700;white-space:nowrap;}
+#watchTable td.w-type{color:var(--muted);white-space:nowrap;font-size:13px;}
+#watchTable td.w-val{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;word-break:break-all;}
+#watchTable tr.changed td{animation:flashRow .8s ease-out;}
+@keyframes flashRow{0%{background:#fff3bf;}100%{background:transparent;}}
+.watch-empty{padding:24px 16px;color:var(--muted);font-size:14px;text-align:center;line-height:1.5;}
+
+/* Console I/O */
+#consoleLog{
+  flex:1 1 auto;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;
+  font-size:14px;-webkit-overflow-scrolling:touch;
+}
+.c-msg{padding:8px 12px;border-radius:10px;max-width:92%;line-height:1.45;white-space:pre-wrap;word-break:break-word;}
+.c-out{background:#223145;color:#d9e6f4;border-left:3px solid #4f93c9;align-self:flex-start;}
+.c-in{background:#1d3428;color:#b9ecc9;border-right:3px solid #46b97d;align-self:flex-end;}
+.c-err{background:#3a1d22;color:#ffb3ba;border-left:3px solid #e2554d;align-self:flex-start;font-weight:600;}
+.c-sys{color:#93a7bf;font-style:italic;align-self:center;font-size:12.5px;text-align:center;}
+.c-prompt{background:#33290f;color:#ffd97a;border-left:3px solid #d9a521;align-self:flex-start;font-weight:600;}
+#consoleForm{
+  display:flex;gap:8px;padding:10px 12px;border-top:1px solid #232d3b;
+  flex:0 0 auto;align-items:center;background:#101620;
+}
+.c-prompt-sym{color:#7f93ab;font-weight:700;font-family:ui-monospace,Menlo,monospace;font-size:16px;}
+/* Font-size 16px obbligatorio su iPhone per evitare lo zoom automatico di Safari */
+#consoleInput{
+  flex:1 1 auto;background:#0a0f16;border:1px solid #2c394b;color:#e6eef7;border-radius:10px;
+  padding:10px 12px;font-size:16px;min-width:0;height:42px;
+}
+#consoleInput:focus{outline:none;border-color:#4f93c9;}
+#consoleInput:disabled{opacity:.5;}
+#consoleSend{height:42px;padding:0 16px;border-radius:10px;font-size:15px;}
+
+/* ---------- Barra di navigazione inferiore iOS (Tab Bar) ---------- */
+#tabBar{
+  display:flex;background:#fff;border-top:1px solid var(--line);
+  padding-bottom:var(--safe-bottom);flex:0 0 auto;z-index:30;
+}
+.tab-item{
+  flex:1 1 0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:7px 4px;border:none;background:transparent;color:var(--muted);
+  font-size:11px;font-weight:600;position:relative;cursor:pointer;
+}
+.tab-item.active{color:var(--accent);}
+.tab-item svg{width:22px;height:22px;}
+.tab-badge{
+  position:absolute;top:4px;right:calc(50% - 20px);
+  background:var(--red);color:#fff;font-size:10px;font-weight:700;
+  min-width:16px;height:16px;border-radius:8px;padding:0 4px;
+  display:flex;align-items:center;justify-content:center;
+}
+.tab-badge[hidden]{display:none;}
+
+/* ---------- Pulsanti generici ---------- */
+.btn{
+  height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:#fff;
+  font-size:14px;font-weight:600;cursor:pointer;color:var(--ink);
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.btn.danger{background:var(--red);border-color:var(--red);color:#fff;}
+
+/* ---------- Bottom Sheet (Menu inserimento blocco / Azioni) ---------- */
+#sheetBackdrop{
+  position:fixed;inset:0;background:rgba(13,24,36,.48);z-index:60;
+  display:flex;flex-direction:column;justify-content:flex-end;
+}
+#sheetBackdrop[hidden]{display:none;}
+#ctxSheet{
+  background:#fff;border-radius:20px 20px 0 0;
+  padding:12px 16px calc(16px + var(--safe-bottom));
+  box-shadow:0 -10px 30px rgba(0,0,0,.2);
+  max-height:80dvh;overflow-y:auto;
+  animation:sheetUp .18s ease-out;
+}
+@keyframes sheetUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.sheet-handle{width:38px;height:4px;background:#cbd5e1;border-radius:2px;margin:0 auto 12px;}
+.menu-title{
+  font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;
+  color:var(--muted);padding:4px 4px 10px;text-align:center;
+}
+.ins-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ins-item{
+  display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;
+  border:1px solid var(--line);background:#fafcfd;font-size:13.5px;font-weight:600;color:var(--ink);
+}
+.ins-item:active{background:#e6f0fa;border-color:var(--accent);}
+.ins-item svg{flex:0 0 auto;}
+
+/* ---------- Finestra modale ottimizzata per iPhone ---------- */
+#modalBackdrop{
+  position:fixed;inset:0;background:rgba(13,24,36,.52);z-index:70;
+  display:flex;align-items:flex-end;justify-content:center;
+}
+#modalBackdrop[hidden]{display:none;}
+.modal{
+  background:#fff;border-radius:20px 20px 0 0;
+  box-shadow:0 -12px 40px rgba(10,22,34,.3);
+  width:100%;max-height:92dvh;
+  display:flex;flex-direction:column;overflow:hidden;
+  padding-bottom:var(--safe-bottom);
+  animation:sheetUp .18s ease-out;
+}
+.modal-head{
+  display:flex;align-items:center;gap:10px;padding:14px 16px;
+  border-bottom:1px solid var(--line);font-size:16px;font-weight:700;
+}
+.modal-body{
+  padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;
+  -webkit-overflow-scrolling:touch;
+}
+.modal-foot{
+  display:flex;justify-content:flex-end;gap:10px;padding:12px 16px;
+  border-top:1px solid var(--line);background:#fafcfd;
+}
+.modal-foot .btn{flex:1 1 0;height:44px;font-size:15px;}
+.f-row{display:flex;flex-direction:column;gap:6px;}
+.f-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);}
+/* Font-size 16px su tutti gli input per prevenire lo zoom di Safari iOS */
+.f-input{
+  height:44px;border:1px solid #c9d5e0;border-radius:10px;padding:0 12px;font-size:16px;
+  background:#fff;color:var(--ink);width:100%;
+}
+textarea.f-input{height:auto;min-height:68px;padding:10px 12px;resize:vertical;line-height:1.4;}
+.f-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,110,168,.15);}
+.f-check{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;padding:4px 0;}
+.f-check input{width:20px;height:20px;accent-color:var(--accent);}
+.f-hint{font-size:12.5px;color:var(--muted);line-height:1.4;}
+.f-error{color:var(--red);font-size:13.5px;font-weight:600;padding:0 16px 12px;white-space:pre-wrap;}
+.confirm-msg{font-size:15px;line-height:1.5;}
+
+/* ---------- Guida ---------- */
+.g-sec h4{margin:4px 0 8px;font-size:13px;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;}
+.g-sec table{border-collapse:collapse;width:100%;font-size:13px;margin-bottom:6px;}
+.g-sec td,.g-sec th{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top;}
+.g-sec th{background:#f0f4f8;}
+.g-sec code{font-family:ui-monospace,Menlo,monospace;background:#eef2f6;padding:2px 5px;border-radius:4px;font-size:12px;}
+.g-sec ul{margin:4px 0;padding-left:20px;font-size:13.5px;line-height:1.5;}
+.g-sec li{margin:4px 0;}
+.g-block{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:13px;}
+.g-block svg{flex:0 0 auto;}
+.g-block b{min-width:105px;display:inline-block;}
+
+/* ---------- Toast ---------- */
+#toast{
+  position:fixed;left:16px;right:16px;top:calc(12px + var(--safe-top));z-index:90;
+  background:#182430;color:#eaf1f8;padding:11px 16px;border-radius:12px;
+  font-size:13.5px;font-weight:600;box-shadow:0 8px 24px rgba(10,20,30,.35);
+  text-align:center;
+}
+#toast.warn{background:#4a3a10;color:#ffe08a;}
+#toast.err{background:#3d1518;color:#ffb9be;}
+
+/* ---------- Stili SVG del diagramma ---------- */
+.edge .vis{fill:none;stroke:#5f6f7e;stroke-width:1.8;}
+/* Area touch più ampia (28px) sulle frecce per facilitare il tap con il dito su iPhone */
+.edge .hit{fill:none;stroke:rgba(0,0,0,0);stroke-width:28;cursor:pointer;}
+.edge:active .vis{stroke:#1d6fb8;stroke-width:3;}
+.blabel{font-size:12px;font-weight:700;}
+.lbl-true{fill:var(--green);}
+.lbl-false{fill:var(--red);}
+.node{cursor:pointer;}
+.node .shape{stroke-width:1.6;}
+.nt-start .shape{fill:#12756a;stroke:#0b5148;}
+.nt-end .shape{fill:#a63c35;stroke:#7c2822;}
+.nt-start text,.nt-end text{fill:#fff;font-weight:700;}
+.nt-declare .shape{fill:#cdbcf0;stroke:#7e5cc4;}
+.nt-assign .shape{fill:#b5e2af;stroke:#3f9142;}
+.nt-input .shape{fill:#aedcf2;stroke:#2a7ca8;}
+.nt-output .shape{fill:#aedcf2;stroke:#2a7ca8;}
+.nt-if .shape{fill:#ffdd75;stroke:#c8901c;}
+.nt-while .shape,.nt-for .shape{fill:#ffc985;stroke:#c47a17;}
+.stripline{stroke:#7e5cc4;stroke-width:1.2;}
+text.n-main{fill:#17303c;}
+text.n-cap{fill:#5d4b86;}
+text.n-sub{fill:#7a551d;}
+.node.sel .shape{stroke:#1d6fb8;stroke-width:3.2;}
+.node.active{filter:drop-shadow(0 0 6px rgba(250,200,20,.95));}
+.node.active .shape{stroke:#e6a817;stroke-width:3.2;}
+.node.done .shape{stroke:#2f9e44;stroke-width:3.2;transition:stroke .12s;}
+.node.error{filter:drop-shadow(0 0 8px rgba(217,48,37,.85));}
+.node.error .shape{stroke:#d93025;stroke-width:3.2;}
+</style>
+</head>
+<body>
+
+<!-- Barra principale -->
+<header id="toolbar">
+  <div class="brand">
+    <svg viewBox="0 0 24 24"><polygon points="12,2 22,12 12,22 2,12" fill="#ffdd75" stroke="#c8901c" stroke-width="1.6"/><polygon points="12,7 17,12 12,17 7,12" fill="#ffc985" stroke="#c47a17" stroke-width="1.4"/></svg>
+    <div class="brand-t"><b>Flowgorithm</b><span>iOS</span></div>
+  </div>
+  <button id="btnPlay" class="tb-btn primary" type="button">Esegui</button>
+  <button id="btnStep" class="tb-btn" type="button">Passo</button>
+  <button id="btnStop" class="tb-btn danger" type="button">Stop</button>
+  <div id="stPill" class="st-idle">Pronto</div>
+</header>
+
+<!-- Barra secondaria scorrevole -->
+<div id="subbar">
+  <div class="speed-box">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M2.2 12.6a5.8 5.8 0 1 1 11.6 0"/><path d="M8 12.6 11 8"/><circle cx="8" cy="12.6" r="1.1" fill="currentColor" stroke="none"/></svg>
+    <input type="range" id="speedRange" min="0" max="5" step="1" value="2" aria-label="Velocità">
+    <span id="speedLabel">Normale</span>
+  </div>
+  <button id="btnNew" class="sub-btn" type="button">Nuovo</button>
+  <button id="btnExample" class="sub-btn" type="button">Esempio</button>
+  <button id="btnCpp" class="sub-btn" type="button">C++</button>
+  <button id="btnExport" class="sub-btn" type="button">Esporta</button>
+  <button id="btnImport" class="sub-btn" type="button">Importa</button>
+  <button id="btnGuide" class="sub-btn" type="button">Guida</button>
+</div>
+
+<!-- Area centrale -->
+<main id="app">
+  <!-- Vista 1: Diagramma di flusso -->
+  <section id="canvasWrap">
+    <svg id="canvas" aria-label="Area del diagramma di flusso">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="#5f6f7e"/>
+        </marker>
+      </defs>
+      <g id="gWorld">
+        <g id="gEdges"></g>
+        <g id="gLabels"></g>
+        <g id="gNodes"></g>
+      </g>
+    </svg>
+    <div id="hintBar">Tocca una freccia per inserire · Tocca un blocco per selezionarlo · Due dita per zoom</div>
+    
+    <!-- Barra azioni contestuale per blocco selezionato -->
+    <div id="nodeActionBar" hidden>
+      <span id="nabTitle">Blocco</span>
+      <button id="nabEdit" class="nab-btn primary" type="button">Modifica</button>
+      <button id="nabDel" class="nab-btn danger" type="button">Elimina</button>
+    </div>
+
+    <div id="zoomBox">
+      <button id="zoomIn" type="button" aria-label="Aumenta zoom">+</button>
+      <button id="zoomFit" type="button" aria-label="Adatta alla finestra">&#9634;</button>
+      <button id="zoomOut" type="button" aria-label="Riduci zoom">&minus;</button>
+    </div>
+  </section>
+
+  <!-- Vista 2: Console Input / Output -->
+  <section class="mobile-view" id="consoleView">
+    <div class="panel-head">
+      <span>Console Input / Output</span>
+      <button id="btnClearConsole" class="mini-btn" type="button">Svuota</button>
+    </div>
+    <div id="consoleLog"></div>
+    <form id="consoleForm" autocomplete="off">
+      <span class="c-prompt-sym">&gt;</span>
+      <input id="consoleInput" type="text" placeholder="In attesa di un Input..." disabled>
+      <button id="consoleSend" class="btn primary" type="submit" disabled>Invia</button>
+    </form>
+  </section>
+
+  <!-- Vista 3: Variabili (Watch) -->
+  <section class="mobile-view" id="watchView">
+    <div class="panel-head">
+      <span>Variabili in memoria <span id="watchCount"></span></span>
+    </div>
+    <div id="watchScroll">
+      <table id="watchTable">
+        <thead><tr><th>Nome</th><th>Tipo</th><th>Valore</th></tr></thead>
+        <tbody id="watchBody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<!-- Tab Bar inferiore iPhone -->
+<nav id="tabBar" role="tablist">
+  <button class="tab-item active" data-tab="diagram" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="5" rx="2.5"/><polygon points="12,10 18,14 12,18 6,14"/><line x1="12" y1="7" x2="12" y2="10"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
+    <span>Diagramma</span>
+  </button>
+  <button class="tab-item" data-tab="console" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+    <span>Console</span>
+    <span id="consoleBadge" class="tab-badge" hidden>!</span>
+  </button>
+  <button class="tab-item" data-tab="vars" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+    <span>Variabili</span>
+    <span id="varsBadge" class="tab-badge" style="background:var(--accent);" hidden>0</span>
+  </button>
+</nav>
+
+<!-- Bottom Sheet per inserimento blocchi -->
+<div id="sheetBackdrop" hidden>
+  <div id="ctxSheet">
+    <div class="sheet-handle"></div>
+    <div id="ctxMenu"></div>
+  </div>
+</div>
+
+<!-- Finestra modale -->
+<div id="modalBackdrop" hidden><div id="modal" class="modal" role="dialog" aria-modal="true"></div></div>
+<div id="toast" hidden></div>
+<input id="fileInput" type="file" accept=".json,application/json" hidden>
+
+<script>
+'use strict';
+/* =====================================================================
+   Flowgorithm Web (Versione iPhone) — Logica completa + Touch/Mobile UI
+   ===================================================================== */
+
+const VGAP = 38;
+const HGAP = 44;
+const SLANT = 18;
+const HEX = 24;
+const MAX_NODES = 500;
+const MAX_DEPTH = 60;
+const MAX_ARRAY = 10000;
+const DELAYS = [900, 450, 220, 100, 30, 0];
+const SPEED_NAMES = ['Lentissima', 'Lenta', 'Normale', 'Veloce', 'Fulminea', 'Istantanea'];
+
+const VAR_TYPES = { Integer: 'Intero', Real: 'Reale', String: 'Stringa', Boolean: 'Booleano' };
+
+const TYPE_META = {
+  start:   { label: 'Inizio',           desc: 'Punto di ingresso del programma (Main)' },
+  end:     { label: 'Fine',             desc: 'Termine dell\'esecuzione del programma' },
+  declare: { label: 'Dichiarazione',    desc: 'Definisce nomi, tipo e dimensione di una o più variabili' },
+  assign:  { label: 'Assegnazione',     desc: 'Assegna il risultato di un\'espressione a una variabile' },
+  input:   { label: 'Input',            desc: 'Legge un valore dalla console e lo salva in una variabile' },
+  output:  { label: 'Output',           desc: 'Stampa testo o il valore di un\'espressione nella console' },
+  if:      { label: 'Se (If)',          desc: 'Dirige il flusso su due rami in base a una condizione' },
+  while:   { label: 'Mentre (While)',   desc: 'Ripete un blocco finché la condizione resta vera' },
+  for:     { label: 'Per (For)',        desc: 'Ciclo con contatore: valore iniziale, finale e passo' },
+};
+
+const RESERVED = new Set(['and', 'or', 'not', 'true', 'false', 'vero', 'falso', 'pi', 'e']);
+
+let doc = null;
+let selectedId = null;
+let conns = [];
+let labels = [];
+let placedNodes = [];
+let layoutBounds = null;
+const view = { x: 60, y: 40, s: 1 };
+let activeTab = 'diagram';
+
+const runState = {
+  status: 'idle',
+  mode: 'run',
+  token: 0,
+  vars: new Map(),
+  forState: new Map(),
+  activeId: null,
+  errorId: null,
+  prevWatch: null,
+};
+let contMap = new Map();
+let proceedResolve = null;
+let sleepResolve = null;
+let inputWait = null;
+let pillTimer = null;
+let consoleMsgs = [];
+let modalState = null;
+
+class FlowError extends Error {
+  constructor(msg) { super(msg); this.name = 'FlowError'; }
+}
+class ExprError extends FlowError {
+  constructor(msg, pos) { super(pos != null ? msg + ' (posizione ' + (pos + 1) + ')' : msg); this.name = 'ExprError'; }
+}
+const ABORT = Symbol('abort');
+
+const nrm = s => String(s || '').toLowerCase();
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function isIdent(s) { return typeof s === 'string' && /^[A-Za-z_]\w*$/.test(s); }
+function parseVarList(str) {
+  return String(str || '').split(',').map(s => s.trim()).filter(Boolean);
+}
+function reservedName(s) { return RESERVED.has(nrm(s)) || !!FUNCS[nrm(s)]; }
+function require(cond, msg) { if (!cond) throw new FlowError(msg); }
+
+/* =====================================================================
+   GESTIONE SCHEDE MOBILE (TAB BAR)
+   ===================================================================== */
+function switchTab(tabName) {
+  activeTab = tabName;
+  document.querySelectorAll('.tab-item').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tabName);
+  });
+  els.consoleView.classList.toggle('active', tabName === 'console');
+  els.watchView.classList.toggle('active', tabName === 'vars');
+  if (tabName === 'console') {
+    els.consoleBadge.hidden = true;
+    els.consoleLog.scrollTop = els.consoleLog.scrollHeight;
+  }
+}
+
+/* =====================================================================
+   MODELLO DATI
+   ===================================================================== */
+function createEmptyDoc() {
+  return {
+    nextId: 1,
+    nodes: {
+      start: { id: 'start', type: 'start', next: 'end' },
+      end: { id: 'end', type: 'end', next: null },
+    },
+  };
+}
+
+function defaultsFor(type) {
+  switch (type) {
+    case 'declare': return { name: 'x', varType: 'Integer', isArray: false, size: 10 };
+    case 'assign':  return { var: 'x', expr: '0' };
+    case 'input':   return { var: 'x' };
+    case 'output':  return { expr: '"Ciao mondo!"', newline: true };
+    case 'if':      return { cond: 'vero' };
+    case 'while':   return { cond: 'vero' };
+    case 'for':     return { var: 'i', from: '0', to: '10', step: '1' };
+    default:        return {};
+  }
+}
+
+function exampleDoc() {
+  const d = createEmptyDoc();
+  const mk = (type, props) => {
+    const id = 'n' + (d.nextId++);
+    d.nodes[id] = Object.assign({ id, type }, defaultsFor(type), props);
+    return id;
+  };
+  const dVars = mk('declare', { name: 'n, somma, i', varType: 'Integer' });
+  const o1   = mk('output', { expr: '"Inserisci un numero intero >= 1:"', newline: true });
+  const inp  = mk('input', { var: 'n' });
+  const iff  = mk('if', { cond: 'n < 1' });
+  const oErr = mk('output', { expr: '"Numero non valido: serviva >= 1."', newline: true });
+  const a0   = mk('assign', { var: 'somma', expr: '0' });
+  const per  = mk('for', { var: 'i', from: '1', to: 'n', step: '1' });
+  const aSum = mk('assign', { var: 'somma', expr: 'somma + i' });
+  const oRes = mk('output', { expr: '"La somma da 1 a " + n + " è " + somma', newline: true });
+
+  docWire(d, 'start', 'next', dVars);
+  docWire(d, dVars, 'next', o1);
+  docWire(d, o1, 'next', inp);
+  docWire(d, inp, 'next', iff);
+  docWire(d, iff, 'next', 'end');
+  docWire(d, iff, 'trueNext', oErr);
+  docWire(d, iff, 'falseNext', a0);
+  docWire(d, a0, 'next', per);
+  docWire(d, per, 'next', oRes);
+  docWire(d, per, 'body', aSum);
+  return d;
+}
+function docWire(d, fromId, field, toId) { d.nodes[fromId][field] = toId; }
+
+function insertNodeAt(type, ctx) {
+  const id = 'n' + (doc.nextId++);
+  const n = Object.assign({ id, type, next: ctx.toId || null }, defaultsFor(type));
+  if (type === 'if') { n.trueNext = null; n.falseNext = null; }
+  if (type === 'while' || type === 'for') n.body = null;
+  doc.nodes[id] = n;
+  doc.nodes[ctx.fromId][ctx.field] = id;
+  return id;
+}
+
+function collectSubtree(rootId) {
+  const out = [rootId];
+  const stack = [];
+  const push = v => { if (v) stack.push(v); };
+  const r = doc.nodes[rootId];
+  push(r.trueNext); push(r.falseNext); push(r.body);
+  while (stack.length) {
+    const id = stack.pop();
+    out.push(id);
+    const n = doc.nodes[id];
+    if (!n) continue;
+    push(n.trueNext); push(n.falseNext); push(n.body); push(n.next);
+  }
+  return out;
+}
+
+function findReferrer(id) {
+  for (const p of Object.values(doc.nodes)) {
+    if (p.id === id) continue;
+    if (p.next === id) return { p, field: 'next' };
+    if (p.trueNext === id) return { p, field: 'trueNext' };
+    if (p.falseNext === id) return { p, field: 'falseNext' };
+    if (p.body === id) return { p, field: 'body' };
+  }
+  return null;
+}
+
+function deleteNodeById(id) {
+  if (id === 'start' || id === 'end') return false;
+  const sub = collectSubtree(id);
+  const n = doc.nodes[id];
+  if (!n) return false;
+  const ref = findReferrer(id);
+  if (ref) ref.p[ref.field] = n.next || null;
+  for (const sid of sub) delete doc.nodes[sid];
+  if (sub.indexOf(selectedId) !== -1) selectNode(null);
+  return true;
+}
+
+function walkDoc(nodes, visitor) {
+  const seen = new Set();
+  function chain(first, after, depth) {
+    let cur = first;
+    const local = new Set();
+    while (cur) {
+      if (cur === 'end') return;
+      const n = nodes[cur];
+      if (!n) throw new FlowError('Riferimento a un blocco inesistente ("' + cur + '").');
+      if (local.has(cur) || seen.has(cur))
+        throw new FlowError('Struttura non valida: ciclo o blocco condiviso.');
+      local.add(cur); seen.add(cur);
+      if (depth > MAX_DEPTH) throw new FlowError('Annidamento troppo profondo (max ' + MAX_DEPTH + ').');
+      visitor(n, after);
+      if (n.type === 'if') {
+        chain(n.trueNext, n.next || after, depth + 1);
+        chain(n.falseNext, n.next || after, depth + 1);
+      } else if (n.type === 'while' || n.type === 'for') {
+        chain(n.body, cur, depth + 1);
+      }
+      if (!n.next) return;
+      cur = n.next;
+    }
+  }
+  if (!nodes.start || !nodes.start.next) { chain(nodes.start ? nodes.start.next : null, 'end', 0); return; }
+  chain(nodes.start.next, 'end', 0);
+}
+
+function computeContinuations(nodes) {
+  const cont = new Map();
+  walkDoc(nodes, (n, after) => cont.set(n.id, after));
+  return cont;
+}
+
+function reachableNodes() {
+  const out = [];
+  try { walkDoc(doc.nodes, n => out.push(n)); } catch (e) {}
+  return out;
+}
+
+function lintDiagram() {
+  try {
+    const declared = new Set();
+    const nodes = reachableNodes();
+    for (const n of nodes) {
+      if (n.type === 'declare') {
+        const names = parseVarList(n.name);
+        for (const nm of names) if (isIdent(nm)) declared.add(nrm(nm));
+      }
+    }
+    const used = new Map();
+    const addUse = (name, nid) => {
+      const k = nrm(name);
+      if (!k || declared.has(k) || RESERVED.has(k) || FUNCS[k]) return;
+      if (!used.has(k)) used.set(k, nid);
+    };
+    for (const n of nodes) {
+      if (n.type === 'assign' || n.type === 'input') {
+        try { const t = parseTarget(n.var); addUse(t.name, n.id); if (t.idxAst) walkAstIds(t.idxAst, addUse); } catch (e) {}
+      }
+      if (n.type === 'for') {
+        addUse(n.var, n.id);
+        for (const s of [n.from, n.to, n.step]) { try { walkAstIds(parseExpr(s), addUse); } catch (e) {} }
+      }
+      const exprs = [];
+      if (n.type === 'assign' || n.type === 'output') exprs.push(n.expr);
+      if (n.type === 'if' || n.type === 'while') exprs.push(n.cond);
+      for (const src of exprs) { try { walkAstIds(parseExpr(src), id => addUse(id, n.id)); } catch (e) {} }
+    }
+    if (used.size) toast('Variabili non dichiarate: ' + Array.from(used.keys()).join(', '), 'warn');
+  } catch (e) {}
+}
+
+function walkAstIds(ast, cb) {
+  if (!ast) return;
+  switch (ast.t) {
+    case 'var': cb(ast.name); break;
+    case 'idx': cb(ast.name); walkAstIds(ast.idx, cb); break;
+    case 'un': walkAstIds(ast.a, cb); break;
+    case 'bin': walkAstIds(ast.a, cb); walkAstIds(ast.b, cb); break;
+    case 'call': for (const x of ast.args) walkAstIds(x, cb); break;
+  }
+}
+
+/* =====================================================================
+   PARSER DELLE ESPRESSIONI
+   ===================================================================== */
+function tokenize(src) {
+  const toks = [];
+  let i = 0;
+  const isDigit = c => c >= '0' && c <= '9';
+  const isAlpha = c => /[A-Za-z_]/.test(c);
+  const isAlnum = c => /[A-Za-z0-9_]/.test(c);
+  while (i < src.length) {
+    const c = src[i];
+    if (c === ' ' || c === '\t' || c === '\n' || c === '\r') { i++; continue; }
+    if (isDigit(c) || (c === '.' && isDigit(src[i + 1]))) {
+      let j = i, dot = false;
+      while (j < src.length && (isDigit(src[j]) || src[j] === '.')) {
+        if (src[j] === '.') { if (dot) break; dot = true; }
+        j++;
+      }
+      const raw = src.slice(i, j);
+      toks.push({ k: 'num', v: dot ? parseFloat(raw) : parseInt(raw, 10), isReal: dot, pos: i });
+      i = j; continue;
+    }
+    if (c === '"' || c === '“' || c === '”') {
+      let j = i + 1, s = '';
+      let closed = false;
+      while (j < src.length) {
+        if (src[j] === '\\') {
+          const nx = src[j + 1];
+          if (nx === '"' || nx === '\\') { s += nx; j += 2; continue; }
+          if (nx === 'n') { s += '\n'; j += 2; continue; }
+          if (nx === 't') { s += '\t'; j += 2; continue; }
+          throw new ExprError('Escape non valido (\\' + nx + ')', j);
+        }
+        if (src[j] === '"' || src[j] === '“' || src[j] === '”') { closed = true; break; }
+        s += src[j]; j++;
+      }
+      if (!closed) throw new ExprError('Stringa non terminata: mancano le virgolette', i);
+      toks.push({ k: 'str', v: s, pos: i });
+      i = j + 1; continue;
+    }
+    if (isAlpha(c)) {
+      let j = i;
+      while (j < src.length && isAlnum(src[j])) j++;
+      toks.push({ k: 'id', v: src.slice(i, j), pos: i });
+      i = j; continue;
+    }
+    const two = src.substr(i, 2);
+    if (two === '==' || two === '!=' || two === '<=' || two === '>=' || two === '&&' || two === '||') {
+      toks.push({ k: 'op', v: two, pos: i }); i += 2; continue;
+    }
+    if ('+-*/%()[]<>!^,'.indexOf(c) !== -1) {
+      toks.push({ k: 'op', v: c, pos: i }); i++; continue;
+    }
+    throw new ExprError('Carattere non valido: "' + c + '"', i);
+  }
+  return toks;
+}
+
+function parseExpr(src) {
+  if (typeof src !== 'string' || !src.trim()) throw new ExprError('Espressione vuota');
+  const p = { i: 0, toks: tokenize(src) };
+  const ast = parseOr(p);
+  if (p.i < p.toks.length) throw new ExprError('Errore di sintassi vicino a "' + tokText(p.toks[p.i]) + '"', p.toks[p.i].pos);
+  return ast;
+}
+function tokText(t) { return t.k === 'str' ? 'testo' : String(t.v); }
+function peekTok(p) { return p.toks[p.i]; }
+function matchOp(p, candidates) {
+  const t = peekTok(p);
+  if (!t) return null;
+  let v = null;
+  if (t.k === 'op' && candidates.indexOf(t.v) !== -1) v = t.v;
+  else if (t.k === 'id' && candidates.indexOf(nrm(t.v)) !== -1) v = nrm(t.v);
+  if (v) p.i++;
+  return v;
+}
+function parseOr(p) {
+  let a = parseAnd(p), op;
+  while ((op = matchOp(p, ['||', 'or']))) a = { t: 'bin', op: '||', a, b: parseAnd(p) };
+  return a;
+}
+function parseAnd(p) {
+  let a = parseEq(p), op;
+  while ((op = matchOp(p, ['&&', 'and']))) a = { t: 'bin', op: '&&', a, b: parseEq(p) };
+  return a;
+}
+function parseEq(p) {
+  let a = parseRel(p), op;
+  while ((op = matchOp(p, ['==', '!=']))) a = { t: 'bin', op, a, b: parseRel(p) };
+  return a;
+}
+function parseRel(p) {
+  let a = parseAdd(p), op;
+  while ((op = matchOp(p, ['<', '>', '<=', '>=']))) a = { t: 'bin', op, a, b: parseAdd(p) };
+  return a;
+}
+function parseAdd(p) {
+  let a = parseMul(p), op;
+  while ((op = matchOp(p, ['+', '-']))) a = { t: 'bin', op, a, b: parseMul(p) };
+  return a;
+}
+function parseMul(p) {
+  let a = parseUnary(p), op;
+  while ((op = matchOp(p, ['*', '/', '%']))) a = { t: 'bin', op, a, b: parseUnary(p) };
+  return a;
+}
+function parseUnary(p) {
+  const t = peekTok(p);
+  if (t && ((t.k === 'op' && (t.v === '-' || t.v === '+')) || (t.k === 'id' && nrm(t.v) === 'not'))) {
+    p.i++;
+    const op = t.k === 'id' ? '!' : t.v;
+    return { t: 'un', op, a: parseUnary(p) };
+  }
+  return parsePow(p);
+}
+function parsePow(p) {
+  const base = parsePrimary(p);
+  if (matchOp(p, ['^'])) return { t: 'bin', op: '^', a: base, b: parseUnary(p) };
+  return base;
+}
+function parsePrimary(p) {
+  const t = peekTok(p);
+  if (!t) throw new ExprError('Espressione incompleta');
+  if (t.k === 'num') { p.i++; return { t: 'num', v: t.v, isReal: t.isReal }; }
+  if (t.k === 'str') { p.i++; return { t: 'str', v: t.v }; }
+  if (t.k === 'id') {
+    const lw = nrm(t.v);
+    p.i++;
+    if (lw === 'true' || lw === 'vero') return { t: 'bool', v: true };
+    if (lw === 'false' || lw === 'falso') return { t: 'bool', v: false };
+    const nt = peekTok(p);
+    if (nt && nt.k === 'op' && nt.v === '(') {
+      if (!FUNCS[lw]) throw new ExprError('Funzione sconosciuta: "' + t.v + '"', t.pos);
+      p.i++;
+      const args = [];
+      const nt2 = peekTok(p);
+      if (!(nt2 && nt2.k === 'op' && nt2.v === ')')) {
+        args.push(parseOr(p));
+        while (matchOp(p, [','])) args.push(parseOr(p));
+      }
+      if (!matchOp(p, [')'])) throw new ExprError('Manca la ")" di chiusura di ' + t.v);
+      return { t: 'call', name: lw, disp: t.v, args };
+    }
+    if (nt && nt.k === 'op' && nt.v === '[') {
+      p.i++;
+      const idx = parseOr(p);
+      if (!matchOp(p, [']'])) throw new ExprError('Manca la "]" di chiusura', t.pos);
+      return { t: 'idx', name: t.v, nameLw: lw, idx, pos: t.pos };
+    }
+    return { t: 'var', name: t.v, nameLw: lw, pos: t.pos };
+  }
+  if (t.k === 'op' && t.v === '(') {
+    p.i++;
+    const e = parseOr(p);
+    if (!matchOp(p, [')'])) throw new ExprError('Manca la ")" di chiusura');
+    return e;
+  }
+  throw new ExprError('Elemento non valido: "' + tokText(t) + '"', t.pos);
+}
+
+function parseTarget(src) {
+  if (typeof src !== 'string' || !src.trim()) throw new FlowError('Variabile di destinazione non specificata');
+  const m = src.match(/^\s*([A-Za-z_]\w*)\s*(?:\[\s*([\s\S]+?)\s*\])?\s*$/);
+  if (!m) throw new FlowError('Destinazione non valida: "' + src + '"');
+  return { name: m[1], nameLw: nrm(m[1]), idxAst: m[2] ? parseExpr(m[2]) : null };
+}
+
+/* =====================================================================
+   VALUTAZIONE TIPIZZATA
+   ===================================================================== */
+const VI = v => ({ t: 'int', v });
+const VR = v => ({ t: 'real', v });
+const VS = v => ({ t: 'str', v });
+const VB = v => ({ t: 'bool', v });
+const TYPE_LABEL = { int: 'Intero', real: 'Reale', str: 'Stringa', bool: 'Booleano' };
+
+function fmtReal(x) {
+  if (!Number.isFinite(x)) return String(x);
+  if (Number.isInteger(x) && Math.abs(x) < 1e15) return String(x);
+  return String(parseFloat(x.toPrecision(12)));
+}
+function valToStr(v) {
+  switch (v.t) {
+    case 'int': return String(v.v);
+    case 'real': return fmtReal(v.v);
+    case 'bool': return v.v ? 'true' : 'false';
+    default: return v.v;
+  }
+}
+function cloneVal(v) { return { t: v.t, v: v.v }; }
+function evalExprStr(src) { return evalAst(parseExpr(src)); }
+
+function evalAst(ast) {
+  switch (ast.t) {
+    case 'num': return ast.isReal ? VR(ast.v) : VI(ast.v);
+    case 'str': return VS(ast.v);
+    case 'bool': return VB(ast.v);
+    case 'var': return evalVarRef(ast);
+    case 'idx': {
+      const info = requireVar(ast.nameLw, ast.name);
+      if (info.kind !== 'array') throw new FlowError('"' + ast.name + '" non è un array');
+      const i = evalIndex(ast.name, info, ast.idx);
+      return info.elems[i];
+    }
+    case 'un': {
+      const v = evalAst(ast.a);
+      if (ast.op === '!') {
+        require(v.t === 'bool', 'L\'operatore "!" richiede un Booleano');
+        return VB(!v.v);
+      }
+      require(v.t === 'int' || v.t === 'real', 'L\'operatore "' + ast.op + '" richiede un numero');
+      if (ast.op === '-') return v.t === 'int' ? VI(-v.v) : VR(-v.v);
+      return v;
+    }
+    case 'bin': return evalBin(ast);
+    case 'call': return evalCall(ast);
+    default: throw new FlowError('Espressione non valida');
+  }
+}
+
+function requireVar(nameLw, dispName) {
+  const info = runState.vars.get(nameLw);
+  if (!info) throw new FlowError('Variabile "' + dispName + '" non dichiarata');
+  return info;
+}
+function evalVarRef(ast) {
+  const info = requireVar(ast.nameLw, ast.name);
+  if (info.kind === 'array')
+    throw new FlowError('Specifica un indice per l\'array "' + ast.name + '", es. ' + ast.name + '[0]');
+  return info.val;
+}
+function evalIndex(dispName, info, idxAst) {
+  const v = evalAst(idxAst);
+  require(v.t === 'int', 'L\'indice di "' + dispName + '" deve essere Intero');
+  if (v.v < 0 || v.v >= info.size)
+    throw new FlowError('Indice fuori intervallo per "' + dispName + '": ' + v.v + ' (0..' + (info.size - 1) + ')');
+  return v.v;
+}
+
+function evalBin(ast) {
+  const op = ast.op;
+  if (op === '&&' || op === '||') {
+    const a = evalAst(ast.a);
+    require(a.t === 'bool', 'L\'operatore "' + op + '" richiede Booleani');
+    if (op === '&&' && !a.v) return VB(false);
+    if (op === '||' && a.v) return VB(true);
+    const b = evalAst(ast.b);
+    require(b.t === 'bool', 'L\'operatore "' + op + '" richiede Booleani');
+    return VB(b.v);
+  }
+  const a = evalAst(ast.a);
+  const b = evalAst(ast.b);
+  const numPair = (a.t === 'int' || a.t === 'real') && (b.t === 'int' || b.t === 'real');
+  const bothInt = a.t === 'int' && b.t === 'int';
+  switch (op) {
+    case '+':
+      if (a.t === 'str' || b.t === 'str') return VS(valToStr(a) + valToStr(b));
+      require(numPair, 'Impossibile sommare ' + TYPE_LABEL[a.t] + ' e ' + TYPE_LABEL[b.t]);
+      return bothInt ? VI(a.v + b.v) : VR(a.v + b.v);
+    case '-':
+    case '*':
+      require(numPair, 'Operazione non valida tra ' + TYPE_LABEL[a.t] + ' e ' + TYPE_LABEL[b.t]);
+      return bothInt ? VI(op === '-' ? a.v - b.v : a.v * b.v) : VR(op === '-' ? a.v - b.v : a.v * b.v);
+    case '/':
+      require(numPair, 'Impossibile dividere ' + TYPE_LABEL[a.t] + ' e ' + TYPE_LABEL[b.t]);
+      if (b.v === 0) throw new FlowError('Divisione per zero');
+      return VR(a.v / b.v);
+    case '%':
+      require(numPair, 'Operatore % non valido');
+      if (b.v === 0) throw new FlowError('Divisione per zero (%)');
+      return bothInt ? VI(a.v % b.v) : VR(a.v % b.v);
+    case '^': {
+      require(numPair, 'Operatore ^ non valido');
+      const r = Math.pow(a.v, b.v);
+      if (!Number.isFinite(r)) throw new FlowError('Risultato potenza non valido');
+      return VR(r);
+    }
+    case '==':
+    case '!=': {
+      const ok = numPair || (a.t === 'str' && b.t === 'str') || (a.t === 'bool' && b.t === 'bool');
+      require(ok, 'Impossibile confrontare ' + TYPE_LABEL[a.t] + ' e ' + TYPE_LABEL[b.t]);
+      const eq = a.v === b.v;
+      return VB(op === '==' ? eq : !eq);
+    }
+    case '<': case '>': case '<=': case '>=': {
+      const ok = numPair || (a.t === 'str' && b.t === 'str');
+      require(ok, 'Impossibile confrontare ' + TYPE_LABEL[a.t] + ' e ' + TYPE_LABEL[b.t]);
+      const r = op === '<' ? a.v < b.v : op === '>' ? a.v > b.v : op === '<=' ? a.v <= b.v : a.v >= b.v;
+      return VB(r);
+    }
+    default: throw new FlowError('Operatore non supportato: ' + op);
+  }
+}
+
+/* ---------------------- Funzioni predefinite ---------------------- */
+function numArg(args, i, fname) {
+  const v = evalAst(args[i]);
+  require(v.t === 'int' || v.t === 'real', fname + ' richiede un numero');
+  return v;
+}
+const FUNCS = {
+  length: {
+    arity: 1,
+    fn(args) {
+      if (args[0].t === 'var') {
+        const info = runState.vars.get(args[0].nameLw);
+        if (info && info.kind === 'array') return VI(info.size);
+      }
+      const v = evalAst(args[0]);
+      require(v.t === 'str', 'Length richiede una Stringa o un array');
+      return VI(v.v.length);
+    },
+  },
+  tointeger: {
+    arity: 1,
+    fn(args) {
+      const v = evalAst(args[0]);
+      if (v.t === 'int') return v;
+      if (v.t === 'real') return VI(Math.trunc(v.v));
+      if (v.t === 'str') {
+        const s = v.v.trim();
+        if (/^[+-]?\d+$/.test(s)) return VI(parseInt(s, 10));
+        throw new FlowError('ToInteger: "' + v.v + '" non è un intero');
+      }
+      throw new FlowError('ToInteger non accetta Booleani');
+    },
+  },
+  toreal: {
+    arity: 1,
+    fn(args) {
+      const v = evalAst(args[0]);
+      if (v.t === 'real') return v;
+      if (v.t === 'int') return VR(v.v);
+      if (v.t === 'str') {
+        const s = v.v.trim();
+        if (/^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(s)) return VR(parseFloat(s));
+        throw new FlowError('ToReal: "' + v.v + '" non è un numero');
+      }
+      throw new FlowError('ToReal non accetta Booleani');
+    },
+  },
+  tostring: { arity: 1, fn(args) { return VS(valToStr(evalAst(args[0]))); } },
+  abs: { arity: 1, fn(args) { const v = numArg(args, 0, 'Abs'); return v.t === 'int' ? VI(Math.abs(v.v)) : VR(Math.abs(v.v)); } },
+  floor: { arity: 1, fn(args) { const v = numArg(args, 0, 'Floor'); return v.t === 'int' ? v : VI(Math.floor(v.v)); } },
+  ceiling: { arity: 1, fn(args) { const v = numArg(args, 0, 'Ceiling'); return v.t === 'int' ? v : VI(Math.ceil(v.v)); } },
+  round: { arity: 1, fn(args) { const v = numArg(args, 0, 'Round'); return v.t === 'int' ? v : VI(Math.round(v.v)); } },
+  sqrt: { arity: 1, fn(args) { const v = numArg(args, 0, 'Sqrt'); if (v.v < 0) throw new FlowError('Sqrt di numero negativo'); return VR(Math.sqrt(v.v)); } },
+  power: {
+    arity: 2,
+    fn(args) {
+      const x = numArg(args, 0, 'Power'), y = numArg(args, 1, 'Power');
+      const r = Math.pow(x.v, y.v);
+      if (!Number.isFinite(r)) throw new FlowError('Power: risultato non valido');
+      return VR(r);
+    },
+  },
+  min: { arity: 2, fn(args) { const x = numArg(args, 0, 'Min'), y = numArg(args, 1, 'Min'); return x.t === 'int' && y.t === 'int' ? VI(Math.min(x.v, y.v)) : VR(Math.min(x.v, y.v)); } },
+  max: { arity: 2, fn(args) { const x = numArg(args, 0, 'Max'), y = numArg(args, 1, 'Max'); return x.t === 'int' && y.t === 'int' ? VI(Math.max(x.v, y.v)) : VR(Math.max(x.v, y.v)); } },
+  random: {
+    arity: 1,
+    fn(args) {
+      const v = evalAst(args[0]);
+      require(v.t === 'int' && v.v > 0, 'Random richiede un intero positivo');
+      return VI(Math.floor(Math.random() * v.v));
+    },
+  },
+};
+function evalCall(ast) {
+  const f = FUNCS[ast.name];
+  if (ast.args.length !== f.arity)
+    throw new FlowError(ast.disp + ' richiede ' + f.arity + ' argomenti');
+  return f.fn(ast.args);
+}
+const FUNC_INFO = [
+  ['Length(x)', 'Lunghezza stringa o array'],
+  ['ToInteger(x)', 'Converte in Intero'],
+  ['ToReal(x)', 'Converte in Reale'],
+  ['ToString(x)', 'Converte in Stringa'],
+  ['Abs(x)', 'Valore assoluto'],
+  ['Floor(x)', 'Arrotonda per difetto'],
+  ['Ceiling(x)', 'Arrotonda per eccesso'],
+  ['Round(x)', 'Arrotonda al più vicino'],
+  ['Sqrt(x)', 'Radice quadrata'],
+  ['Power(a, b)', 'Potenza a^b'],
+  ['Min(a, b)', 'Minimo tra due numeri'],
+  ['Max(a, b)', 'Massimo tra due numeri'],
+  ['Random(n)', 'Intero casuale 0..n-1'],
+];
+
+/* =====================================================================
+   MOTORE DI ESECUZIONE
+   ===================================================================== */
+function setStatus(s) { runState.status = s; refreshToolbar(); }
+function speedDelay() { const v = +els.speedRange.value; return DELAYS[v] != null ? DELAYS[v] : 220; }
+
+function sleepI(token, ms) {
+  return new Promise(res => {
+    const t = setTimeout(() => { sleepResolve = null; res(); }, Math.max(0, ms));
+    sleepResolve = () => { clearTimeout(t); sleepResolve = null; res(); };
+  });
+}
+function checkAbort(token) { if (token !== runState.token) throw ABORT; }
+function waitProceed() {
+  return new Promise(res => { proceedResolve = () => { proceedResolve = null; res(); }; });
+}
+function abortRun() {
+  runState.token++;
+  runState.mode = 'run';
+  if (proceedResolve) { const r = proceedResolve; proceedResolve = null; r(); }
+  if (sleepResolve) { const r = sleepResolve; sleepResolve = null; r(); }
+  if (inputWait) {
+    const w = inputWait; inputWait = null;
+    deactivateInput();
+    w.resolve({ aborted: true });
+  }
+}
+
+function nodeEl(id) { return els.gNodes.querySelector('g.node[data-id="' + id + '"]'); }
+function setActive(id) {
+  const prev = runState.activeId;
+  if (prev) { const el = nodeEl(prev); if (el) el.classList.remove('active', 'error'); }
+  runState.activeId = id;
+  if (id) { const el = nodeEl(id); if (el) el.classList.add('active'); }
+}
+function markActiveError() {
+  runState.errorId = runState.activeId;
+  const el = nodeEl(runState.activeId);
+  if (el) el.classList.add('error');
+}
+function flashDone(id) {
+  const el = nodeEl(id);
+  if (!el) return;
+  el.classList.add('done');
+  setTimeout(() => el.classList.remove('done'), 240);
+}
+
+function resolveNext(node) { return node.next || contMap.get(node.id) || null; }
+function evalCond(src) {
+  const v = evalExprStr(src);
+  if (v.t !== 'bool') throw new FlowError('La condizione non è Booleana: "' + src + '"');
+  return v.v;
+}
+function evalIntExpr(src, what) {
+  const v = evalExprStr(src);
+  if (v.t === 'int') return v.v;
+  throw new FlowError(what + ' deve essere Intero');
+}
+
+async function startExecution(mode) {
+  if (runState.status === 'running' || runState.status === 'paused' || runState.status === 'waiting') return;
+  selectNode(null);
+  runState.vars = new Map();
+  runState.forState = new Map();
+  runState.prevWatch = null;
+  runState.errorId = null;
+  setActive(null);
+  clearConsole();
+  appendConsole('sys', mode === 'step' ? 'Esecuzione passo-passo avviata.' : 'Esecuzione avviata.');
+  
+  // In modalità esecuzione continua, passa automaticamente alla Console per vedere gli output
+  if (mode === 'run') switchTab('console');
+
+  const token = ++runState.token;
+  runState.mode = mode;
+  try {
+    contMap = computeContinuations(doc.nodes);
+  } catch (e) {
+    appendConsole('err', 'ERRORE: ' + e.message);
+    toast(e.message, 'err');
+    setStatus('idle');
+    setPill('error', 'Errore', 2600);
+    return;
+  }
+  refreshWatch();
+  let m = mode;
+  try {
+    let cur = doc.nodes.start.next;
+    let first = true;
+    while (cur) {
+      checkAbort(token);
+      if (cur === 'end') {
+        setActive('end');
+        await sleepI(token, 130);
+        checkAbort(token);
+        flashDone('end');
+        setActive(null);
+        break;
+      }
+      if (m === 'run' && runState.mode === 'pause') m = runState.mode;
+      setActive(cur);
+      if (!first && m !== 'run') {
+        setStatus('paused');
+        await waitProceed();
+        checkAbort(token);
+        m = runState.mode;
+      }
+      first = false;
+      const node = doc.nodes[cur];
+      if (!node) throw new FlowError('Blocco inesistente ("' + cur + '")');
+      let nextId;
+      switch (node.type) {
+        case 'declare': doDeclare(node); nextId = resolveNext(node); break;
+        case 'assign': doAssign(node); nextId = resolveNext(node); break;
+        case 'input': await doInput(node, token); checkAbort(token); nextId = resolveNext(node); break;
+        case 'output': doOutput(node); nextId = resolveNext(node); break;
+        case 'if': {
+          const c = evalCond(node.cond);
+          nextId = c ? (node.trueNext || resolveNext(node)) : (node.falseNext || resolveNext(node));
+          break;
+        }
+        case 'while': {
+          const c = evalCond(node.cond);
+          nextId = c ? (node.body || cur) : resolveNext(node);
+          break;
+        }
+        case 'for': nextId = stepFor(node); break;
+        default: throw new FlowError('Blocco non eseguibile: ' + node.type);
+      }
+      flashDone(cur);
+      cur = nextId;
+      if (m === 'run') {
+        await sleepI(token, speedDelay());
+        checkAbort(token);
+      }
+    }
+    appendConsole('sys', 'Programma terminato.');
+    setStatus('idle');
+    setPill('done', 'Terminato', 2200);
+  } catch (e) {
+    if (e === ABORT) {
+      setActive(null);
+      appendConsole('sys', 'Esecuzione arrestata.');
+    } else {
+      markActiveError();
+      appendConsole('err', 'ERRORE: ' + e.message);
+      toast(e.message, 'err');
+      switchTab('console');
+      setPill('error', 'Errore', 2800);
+    }
+    setStatus('idle');
+  } finally {
+    proceedResolve = null;
+    refreshWatch();
+  }
+}
+
+/* ------------------------------ Blocchi ------------------------------ */
+function defaultOf(type) {
+  return { Integer: VI(0), Real: VR(0), String: VS(''), Boolean: VB(false) }[type] || VI(0);
+}
+function doDeclare(node) {
+  const names = parseVarList(node.name);
+  if (!names.length) throw new FlowError('Nessuna variabile specificata');
+  for (const name of names) {
+    if (!isIdent(name)) throw new FlowError('Nome non valido: "' + name + '"');
+    if (runState.vars.has(nrm(name))) throw new FlowError('Variabile "' + name + '" già dichiarata');
+  }
+  if (!VAR_TYPES[node.varType]) node.varType = 'Integer';
+  for (const name of names) {
+    const k = nrm(name);
+    let info;
+    if (node.isArray) {
+      const size = node.size | 0;
+      if (!(size >= 1 && size <= MAX_ARRAY)) throw new FlowError('Dimensione array non valida');
+      const dflt = defaultOf(node.varType);
+      info = { kind: 'array', type: node.varType, name, size, elems: Array.from({ length: size }, () => cloneVal(dflt)) };
+    } else {
+      info = { kind: 'scalar', type: node.varType, name, val: defaultOf(node.varType) };
+    }
+    runState.vars.set(k, info);
+  }
+  refreshWatch();
+}
+
+function checkAssignType(type, val, destName) {
+  if (type === 'Integer' && val.t === 'int') return;
+  if (type === 'Real') {
+    if (val.t === 'int') { val.t = 'real'; return; }
+    if (val.t === 'real') return;
+  }
+  if (type === 'String' && val.t === 'str') return;
+  if (type === 'Boolean' && val.t === 'bool') return;
+  throw new FlowError('Tipo incompatibile per "' + destName + '" (atteso ' + VAR_TYPES[type] + ', ottenuto ' + TYPE_LABEL[val.t] + ')');
+}
+
+function doAssign(node) {
+  const tgt = parseTarget(node.var);
+  const info = requireVar(tgt.nameLw, tgt.name);
+  const val = evalExprStr(node.expr);
+  if (tgt.idxAst) {
+    if (info.kind !== 'array') throw new FlowError('"' + tgt.name + '" non è un array');
+    const i = evalIndex(tgt.name, info, tgt.idxAst);
+    checkAssignType(info.type, val, info.name + '[' + i + ']');
+    info.elems[i] = val;
+  } else {
+    if (info.kind === 'array') throw new FlowError('Indica un indice per "' + info.name + '"');
+    checkAssignType(info.type, val, info.name);
+    info.val = val;
+  }
+  refreshWatch();
+}
+
+function doOutput(node) {
+  const v = evalExprStr(node.expr);
+  const s = valToStr(v);
+  if (node.newline === false) appendPartial(s);
+  else appendConsole('out', s);
+}
+
+function coerceInput(raw, type) {
+  const s = String(raw);
+  if (!s.trim()) return null;
+  switch (type) {
+    case 'Integer': return /^[+-]?\d+$/.test(s.trim()) ? VI(parseInt(s.trim(), 10)) : null;
+    case 'Real': return /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(s.trim()) ? VR(parseFloat(s.trim())) : null;
+    case 'Boolean': {
+      const k = s.trim().toLowerCase();
+      if (k === 'true' || k === 'vero') return VB(true);
+      if (k === 'false' || k === 'falso') return VB(false);
+      return null;
+    }
+    default: return VS(s);
+  }
+}
+
+async function doInput(node, token) {
+  const tgt = parseTarget(node.var);
+  const info = requireVar(tgt.nameLw, tgt.name);
+  if (info.kind === 'array' && !tgt.idxAst) throw new FlowError('Indica l\'elemento dell\'array, es. ' + tgt.name + '[0]');
+  if (info.kind !== 'array' && tgt.idxAst) throw new FlowError('"' + tgt.name + '" non è un array');
+  const idx = tgt.idxAst ? evalIndex(tgt.name, info, tgt.idxAst) : -1;
+  
+  setStatus('waiting');
+  // Passa automaticamente alla scheda Console per mostrare la tastiera dell'iPhone
+  switchTab('console');
+  
+  while (true) {
+    appendConsole('prompt', 'Inserisci ' + node.var + ' (' + VAR_TYPES[info.type] + '):');
+    activateInput(info.type);
+    const res = await new Promise(res2 => { inputWait = { resolve: res2 }; });
+    if (res.aborted || token !== runState.token) throw ABORT;
+    const val = coerceInput(res.raw, info.type);
+    if (!val) {
+      appendConsole('err', 'Valore non valido per ' + VAR_TYPES[info.type] + ': "' + res.raw + '"');
+      continue;
+    }
+    appendConsole('in', res.raw);
+    if (idx >= 0) {
+      checkAssignType(info.type, val, info.name + '[' + idx + ']');
+      info.elems[idx] = val;
+    } else {
+      checkAssignType(info.type, val, info.name);
+      info.val = val;
+    }
+    refreshWatch();
+    setStatus('running');
+    return;
+  }
+}
+
+function stepFor(node) {
+  const info = requireVar(nrm(node.var), node.var);
+  if (info.kind !== 'scalar' || info.type !== 'Integer')
+    throw new FlowError('Il contatore "' + node.var + '" deve essere Intero');
+  let st = runState.forState.get(node.id);
+  if (!st) {
+    const from = evalIntExpr(node.from, 'Valore iniziale Per');
+    const to = evalIntExpr(node.to, 'Valore finale Per');
+    const step = evalIntExpr(node.step, 'Passo Per');
+    if (step === 0) throw new FlowError('Il passo non può essere zero');
+    st = { to, step };
+    runState.forState.set(node.id, st);
+    info.val = VI(from);
+  } else {
+    info.val = VI(info.val.v + st.step);
+  }
+  refreshWatch();
+  const v = info.val.v;
+  return (st.step > 0 ? v <= st.to : v >= st.to) ? (node.body || node.id) : resolveNext(node);
+}
+
+/* ------------------------------ Console I/O ------------------------------ */
+function renderConsole() {
+  els.consoleLog.innerHTML = consoleMsgs.map(m => '<div class="c-msg c-' + m.kind + '">' + esc(m.text) + '</div>').join('');
+  els.consoleLog.scrollTop = els.consoleLog.scrollHeight;
+  if (activeTab !== 'console' && consoleMsgs.length > 0) {
+    els.consoleBadge.hidden = false;
+  }
+}
+function appendConsole(kind, text) { consoleMsgs.push({ kind, text }); renderConsole(); }
+function appendPartial(text) {
+  const last = consoleMsgs[consoleMsgs.length - 1];
+  if (last && last.kind === 'out' && last.partial) last.text += text;
+  else consoleMsgs.push({ kind: 'out', text, partial: true });
+  renderConsole();
+}
+function clearConsole() { consoleMsgs = []; renderConsole(); els.consoleBadge.hidden = true; }
+
+function activateInput(varType) {
+  els.consoleInput.disabled = false;
+  els.consoleSend.disabled = false;
+  // Ottimizza la tastiera virtuale dell'iPhone in base al tipo di dato
+  if (varType === 'Integer') els.consoleInput.setAttribute('inputmode', 'numeric');
+  else if (varType === 'Real') els.consoleInput.setAttribute('inputmode', 'decimal');
+  else els.consoleInput.setAttribute('inputmode', 'text');
+  els.consoleInput.placeholder = 'Digita valore e tocca Invia…';
+  setTimeout(() => els.consoleInput.focus(), 100);
+}
+function deactivateInput() {
+  if (!els.consoleInput) return;
+  els.consoleInput.disabled = true;
+  els.consoleSend.disabled = true;
+  els.consoleInput.value = '';
+  els.consoleInput.removeAttribute('inputmode');
+  els.consoleInput.placeholder = 'In attesa di un blocco Input...';
+}
+
+/* ------------------------------ Watch Window ------------------------------ */
+function truncateStr(s, n) { return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+function watchVal(info) {
+  if (info.kind === 'array') {
+    const parts = info.elems.slice(0, 14).map(e => e.t === 'str' ? (e.v === '' ? '""' : '"' + truncateStr(e.v, 20) + '"') : valToStr(e));
+    if (info.size > 14) parts.push('…');
+    return '[' + parts.join(', ') + ']';
+  }
+  const v = info.val;
+  if (v.t === 'str') return v.v === '' ? '""' : truncateStr(v.v, 40);
+  return valToStr(v);
+}
+function watchType(info) { return VAR_TYPES[info.type] + (info.kind === 'array' ? '[' + info.size + ']' : ''); }
+function refreshWatch() {
+  let rows = [];
+  if (runState.vars.size) {
+    for (const [k, info] of runState.vars) {
+      rows.push({ key: k, name: info.name, type: watchType(info), val: watchVal(info) });
+    }
+  } else {
+    for (const n of reachableNodes()) {
+      if (n.type === 'declare') {
+        const names = parseVarList(n.name);
+        for (const nm of names) {
+          rows.push({ key: nrm(nm), name: nm, type: VAR_TYPES[n.varType] + (n.isArray ? '[' + n.size + ']' : ''), val: '—' });
+        }
+      }
+    }
+  }
+  const prev = runState.prevWatch;
+  els.watchBody.innerHTML = rows.length
+    ? rows.map(r => {
+        const ch = prev && prev.has(r.key) && prev.get(r.key) !== r.val;
+        return '<tr' + (ch ? ' class="changed"' : '') + '><td class="w-name">' + esc(r.name) + '</td><td class="w-type">' +
+          esc(r.type) + '</td><td class="w-val">' + esc(r.val) + '</td></tr>';
+      }).join('')
+    : '<tr><td colspan="3"><div class="watch-empty">Nessuna variabile dichiarata.<br>Tocca una freccia nel diagramma e inserisci un blocco <b>Dichiarazione</b>.</div></td></tr>';
+  els.watchCount.textContent = rows.length ? '(' + rows.length + ')' : '';
+  if (rows.length > 0) {
+    els.varsBadge.textContent = rows.length;
+    els.varsBadge.hidden = false;
+  } else {
+    els.varsBadge.hidden = true;
+  }
+  runState.prevWatch = new Map(rows.map(r => [r.key, r.val]));
+}
+
+/* ------------------------------ Barra degli strumenti ------------------------------ */
+function setBtn(btn, label, icon, disabled) {
+  btn.innerHTML = icon + '<span>' + esc(label) + '</span>';
+  btn.disabled = !!disabled;
+}
+function pillFromStatus() {
+  const map = {
+    idle: ['st-idle', 'Pronto'],
+    running: ['st-running', 'In corso'],
+    paused: ['st-paused', 'Pausa'],
+    waiting: ['st-waiting', 'Input'],
+  };
+  const m = map[runState.status] || map.idle;
+  els.stPill.className = m[0];
+  els.stPill.textContent = m[1];
+}
+function setPill(kind, text, ms) {
+  els.stPill.className = 'st-' + kind;
+  els.stPill.textContent = text;
+  if (pillTimer) clearTimeout(pillTimer);
+  if (ms) pillTimer = setTimeout(() => { pillTimer = null; pillFromStatus(); }, ms);
+}
+function refreshToolbar() {
+  const s = runState.status;
+  if (s === 'running') setBtn(els.btnPlay, 'Pausa', ICONS.pause, false);
+  else if (s === 'paused') setBtn(els.btnPlay, 'Riprendi', ICONS.play, false);
+  else if (s === 'waiting') setBtn(els.btnPlay, 'Esegui', ICONS.play, true);
+  else setBtn(els.btnPlay, 'Esegui', ICONS.play, false);
+  setBtn(els.btnStep, 'Passo', ICONS.step, !(s === 'idle' || s === 'paused'));
+  setBtn(els.btnStop, 'Stop', ICONS.stop, !(s === 'running' || s === 'paused' || s === 'waiting'));
+  if (!pillTimer) pillFromStatus();
+}
+
+/* =====================================================================
+   INTERFACCIA E ELEMENTI
+   ===================================================================== */
+const els = {};
+function grabEls() {
+  ['canvas', 'gWorld', 'gEdges', 'gLabels', 'gNodes', 'canvasWrap',
+   'zoomIn', 'zoomOut', 'zoomFit', 'nodeActionBar', 'nabTitle', 'nabEdit', 'nabDel',
+   'btnNew', 'btnExample', 'btnPlay', 'btnStep', 'btnStop', 'btnExport', 'btnImport', 'btnCpp', 'btnGuide',
+   'speedRange', 'speedLabel', 'stPill', 'watchBody', 'watchCount',
+   'consoleView', 'watchView', 'consoleBadge', 'varsBadge',
+   'consoleLog', 'consoleForm', 'consoleInput', 'consoleSend', 'btnClearConsole',
+   'sheetBackdrop', 'ctxMenu', 'modalBackdrop', 'modal', 'toast', 'fileInput',
+  ].forEach(id => { els[id] = document.getElementById(id); });
+}
+
+function svgWrap(inner, size) {
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
+}
+const ICONS = {
+  play: '<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5 13.5 8 4 13.5z"/></svg>',
+  pause: '<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M3.6 2.5h2.8v11H3.6zM9.6 2.5h2.8v11H9.6z"/></svg>',
+  step: '<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M3 2.5h2.4v11H3z"/><path d="M6.8 2.5 14.2 8l-7.4 5.5z"/></svg>',
+  stop: '<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="3" width="10" height="10" rx="1.6"/></svg>',
+  fit: svgWrap('<path d="M2 5.5V2h3.5M10.5 2H14v3.5M14 10.5V14h-3.5M5.5 14H2v-3.5"/>', 18),
+  pencil: svgWrap('<path d="M3 13l.8-2.9 7.1-7.1 2.1 2.1-7.1 7.1z"/><path d="M9.6 3.4l2.1 2.1"/>', 14),
+  trash: svgWrap('<path d="M2.8 4.2h10.4M6.4 2.2h3.2M4.2 4.5l.6 9.1h6.4l.6-9.1M6.7 7v4M9.3 7v4"/>', 14),
+};
+const SWATCH = {
+  start: '<svg width="28" height="16"><rect x="1" y="1" width="26" height="14" rx="7" fill="#12756a" stroke="#0b5148"/></svg>',
+  end: '<svg width="28" height="16"><rect x="1" y="1" width="26" height="14" rx="7" fill="#a63c35" stroke="#7c2822"/></svg>',
+  declare: '<svg width="28" height="16"><rect x="1" y="1" width="26" height="14" rx="2" fill="#cdbcf0" stroke="#7e5cc4"/><line x1="1" y1="5" x2="27" y2="5" stroke="#7e5cc4"/></svg>',
+  assign: '<svg width="28" height="16"><rect x="1" y="1" width="26" height="14" rx="2" fill="#b5e2af" stroke="#3f9142"/></svg>',
+  input: '<svg width="28" height="16"><polygon points="6,1 27,1 22,15 1,15" fill="#aedcf2" stroke="#2a7ca8"/></svg>',
+  output: '<svg width="28" height="16"><polygon points="1,1 22,1 27,15 6,15" fill="#aedcf2" stroke="#2a7ca8"/></svg>',
+  if: '<svg width="28" height="16"><polygon points="14,1 27,8 14,15 1,8" fill="#ffdd75" stroke="#c8901c"/></svg>',
+  while: '<svg width="28" height="16"><polygon points="6,1 22,1 28,8 22,15 6,15 0,8" fill="#ffc985" stroke="#c47a17"/></svg>',
+  for: '<svg width="28" height="16"><polygon points="6,1 22,1 28,8 22,15 6,15 0,8" fill="#ffc985" stroke="#c47a17"/></svg>',
+};
+
+const F_MAIN = "600 13px -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif";
+const F_CAP = "500 10px -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif";
+const measCtx = document.createElement('canvas').getContext('2d');
+function tw(s, font) { measCtx.font = font || F_MAIN; return measCtx.measureText(String(s)).width; }
+function truncTo(s, maxPx, font) {
+  if (tw(s, font) <= maxPx) return s;
+  let t = String(s);
+  while (t.length && tw(t + '\u2026', font) > maxPx) t = t.slice(0, -1);
+  return t + '\u2026';
+}
+function injectFontStyle() {
+  const st = document.createElement('style');
+  st.textContent = '#gNodes text.n-main{font:' + F_MAIN + '} #gNodes text.n-cap,#gNodes text.n-sub{font:' + F_CAP + '}';
+  document.head.appendChild(st);
+}
+
+function sizedText(text, minW, pad, h, maxW) {
+  let w = Math.max(minW, tw(text) + pad);
+  let main = text;
+  if (w > maxW) { w = maxW; main = truncTo(text, maxW - pad); }
+  return { w: Math.round(w), h, main };
+}
+function sizeNode(n) {
+  switch (n.type) {
+    case 'start': return sizedText('Inizio (Main)', 124, 56, 46, 260);
+    case 'end': return sizedText('Fine', 102, 56, 46, 260);
+    case 'declare': {
+      const t = (n.name || '?') + ': ' + (VAR_TYPES[n.varType] || n.varType) + (n.isArray ? '[' + (n.size || 0) + ']' : '');
+      const r = sizedText(t, 154, 40, 58, 320);
+      r.cap = 'Dichiarazione'; r.strip = 19;
+      return r;
+    }
+    case 'assign': return sizedText((n.var || '?') + ' = ' + (n.expr || '?'), 154, 36, 46, 340);
+    case 'input': return sizedText('Leggi ' + (n.var || '?'), 154, 46, 48, 310);
+    case 'output': return sizedText('Scrivi ' + (n.expr || '?'), 154, 46, 48, 320);
+    case 'if': return sizedText(n.cond || '?', 176, 86, 86, 320);
+    case 'while': return sizedText(n.cond || '?', 194, 86, 62, 330);
+    case 'for': {
+      const t = (n.var || '?') + ' = ' + (n.from || '?') + ' a ' + (n.to || '?');
+      const sub = String(n.step != null ? n.step : '1') !== '1' ? 'passo ' + n.step : null;
+      const extra = sub ? tw(sub, F_CAP) + 16 : 0;
+      const r = sizedText(t, 204, 86 + extra, sub ? 66 : 62, 360);
+      r.sub = sub;
+      return r;
+    }
+    default: return sizedText(n.type, 140, 40, 46, 300);
+  }
+}
+
+/* =====================================================================
+   LAYOUT AUTOMATICO
+   ===================================================================== */
+function newCanvas() { return { nodes: [], edges: [], labels: [], left: 0, right: 0, top: 0, bottom: 0 }; }
+function growCv(cv, x0, y0, x1, y1) {
+  if (x0 < cv.left) cv.left = x0;
+  if (x1 > cv.right) cv.right = x1;
+  if (y0 < cv.top) cv.top = y0;
+  if (y1 > cv.bottom) cv.bottom = y1;
+}
+function translateCv(cv, dx, dy) {
+  for (const n of cv.nodes) { n._x += dx; n._y += dy; }
+  for (const e of cv.edges) for (const p of e.pts) { p.x += dx; p.y += dy; }
+  for (const l of cv.labels) { l.x += dx; l.y += dy; }
+  cv.left += dx; cv.right += dx; cv.top += dy; cv.bottom += dy;
+}
+function mergeCv(dst, src) {
+  for (const n of src.nodes) dst.nodes.push(n);
+  for (const e of src.edges) dst.edges.push(e);
+  for (const l of src.labels) dst.labels.push(l);
+  growCv(dst, src.left, src.top, src.right, src.bottom);
+}
+function addEdge(cv, pts, ctx, opts) {
+  const e = { pts, ctx, kind: (opts && opts.kind) || 'flow', noArrow: !!(opts && opts.noArrow) };
+  cv.edges.push(e);
+  for (const p of pts) growCv(cv, p.x, p.y, p.x, p.y);
+}
+function addLabel(cv, x, y, text, cls, anchor) { cv.labels.push({ x, y, text, cls, anchor: anchor || 'middle' }); }
+function placeSimple(cv, n, cx, y) {
+  const sz = sizeNode(n);
+  n._x = cx - sz.w / 2; n._y = y; n._w = sz.w; n._h = sz.h; n._info = sz;
+  cv.nodes.push(n);
+  growCv(cv, n._x, n._y, n._x + sz.w, n._y + sz.h);
+  return { x: cx, y: y + sz.h };
+}
+
+function layoutSeq(firstId, cv, y0) {
+  let y = y0 || 0, cur = firstId, exit = null, lastId = null;
+  const guard = new Set();
+  while (cur) {
+    if (guard.has(cur)) throw new FlowError('Il diagramma contiene un ciclo.');
+    guard.add(cur);
+    const n = doc.nodes[cur];
+    if (!n) throw new FlowError('Blocco inesistente ("' + cur + '")');
+    if (n.type === 'if') exit = layoutIf(n, 0, y, cv);
+    else if (n.type === 'while' || n.type === 'for') exit = layoutLoop(n, 0, y, cv);
+    else exit = placeSimple(cv, n, 0, y);
+    lastId = cur;
+    if (!n.next) break;
+    const nid = n.next;
+    addEdge(cv, [{ x: exit.x, y: exit.y }, { x: 0, y: exit.y + VGAP }], { fromId: n.id, field: 'next', toId: nid });
+    y = exit.y + VGAP;
+    cur = nid;
+  }
+  return { bottom: exit ? exit.y : (y0 || 0), exitPt: exit, lastId };
+}
+
+function layoutIf(n, cx, y, cv) {
+  const sz = sizeNode(n);
+  n._x = cx - sz.w / 2; n._y = y; n._w = sz.w; n._h = sz.h; n._info = sz;
+  cv.nodes.push(n);
+  growCv(cv, n._x, n._y, n._x + sz.w, n._y + sz.h);
+  const midY = y + sz.h / 2;
+  const dR = { x: cx + sz.w / 2, y: midY };
+  const dL = { x: cx - sz.w / 2, y: midY };
+  const tcv = newCanvas(), fcv = newCanvas();
+  const tinf = layoutSeq(n.trueNext, tcv, 0);
+  const finf = layoutSeq(n.falseNext, fcv, 0);
+  const xT = cx + sz.w / 2 + HGAP - tcv.left;
+  const xF = cx - sz.w / 2 - HGAP - fcv.right;
+  const bTop = y + sz.h + VGAP;
+  translateCv(tcv, xT, bTop);
+  translateCv(fcv, xF, bTop);
+  mergeCv(cv, tcv);
+  mergeCv(cv, fcv);
+  const mergeY = bTop + Math.max(tinf.bottom, finf.bottom) + VGAP;
+  if (n.trueNext) {
+    addEdge(cv, [dR, { x: xT, y: midY }, { x: xT, y: bTop }], { fromId: n.id, field: 'trueNext', toId: n.trueNext });
+    addEdge(cv, [{ x: xT, y: bTop + tinf.bottom }, { x: xT, y: mergeY }, { x: cx, y: mergeY }],
+      { fromId: tinf.lastId, field: 'next', toId: n.next }, { noArrow: true });
+  } else {
+    addEdge(cv, [dR, { x: xT, y: midY }, { x: xT, y: mergeY }, { x: cx, y: mergeY }],
+      { fromId: n.id, field: 'trueNext', toId: null }, { noArrow: true });
+  }
+  if (n.falseNext) {
+    addEdge(cv, [dL, { x: xF, y: midY }, { x: xF, y: bTop }], { fromId: n.id, field: 'falseNext', toId: n.falseNext });
+    addEdge(cv, [{ x: xF, y: bTop + finf.bottom }, { x: xF, y: mergeY }, { x: cx, y: mergeY }],
+      { fromId: finf.lastId, field: 'next', toId: n.next }, { noArrow: true });
+  } else {
+    addEdge(cv, [dL, { x: xF, y: midY }, { x: xF, y: mergeY }, { x: cx, y: mergeY }],
+      { fromId: n.id, field: 'falseNext', toId: null }, { noArrow: true });
+  }
+  addLabel(cv, dR.x + 8, midY - 9, 'Vero', 'lbl-true', 'start');
+  addLabel(cv, dL.x - 8, midY - 9, 'Falso', 'lbl-false', 'end');
+  return { x: cx, y: mergeY };
+}
+
+function layoutLoop(n, cx, y, cv) {
+  const sz = sizeNode(n);
+  n._x = cx - sz.w / 2; n._y = y; n._w = sz.w; n._h = sz.h; n._info = sz;
+  cv.nodes.push(n);
+  growCv(cv, n._x, n._y, n._x + sz.w, n._y + sz.h);
+  const midY = y + sz.h / 2;
+  const leftV = { x: cx - sz.w / 2, y: midY };
+  const rightV = { x: cx + sz.w / 2, y: midY };
+  const bcv = newCanvas();
+  const binf = layoutSeq(n.body, bcv, 0);
+  const bTop = y + sz.h + VGAP;
+  translateCv(bcv, cx, bTop);
+  mergeCv(cv, bcv);
+  const bodyBottom = bTop + binf.bottom;
+  const backX = cx + Math.min(bcv.left - HGAP, -(sz.w / 2 + 26));
+  const exitX = cx + Math.max(bcv.right + HGAP, sz.w / 2 + 26);
+  if (n.body) {
+    addEdge(cv, [{ x: cx, y: y + sz.h }, { x: cx, y: bTop }], { fromId: n.id, field: 'body', toId: n.body });
+    addEdge(cv, [{ x: cx, y: bodyBottom }, { x: backX, y: bodyBottom }, { x: backX, y: midY }, leftV],
+      { fromId: binf.lastId, field: 'next', toId: null }, { kind: 'back' });
+  } else {
+    const stubY = bTop + VGAP;
+    addEdge(cv, [{ x: cx, y: y + sz.h }, { x: cx, y: stubY }, { x: backX, y: stubY }, { x: backX, y: midY }, leftV],
+      { fromId: n.id, field: 'body', toId: null }, { kind: 'back' });
+  }
+  const exitY = bodyBottom + (n.body ? VGAP : 2 * VGAP);
+  addEdge(cv, [rightV, { x: exitX, y: midY }, { x: exitX, y: exitY }, { x: cx, y: exitY }],
+    { fromId: n.id, field: 'next', toId: n.next }, { noArrow: true, kind: 'exit' });
+  return { x: cx, y: exitY };
+}
+
+function layoutAll() {
+  const cv = newCanvas();
+  const s = doc.nodes.start;
+  const startExit = placeSimple(cv, s, 0, 0);
+  const inf = layoutSeq(s.next, cv, startExit.y + VGAP);
+  if (s.next) addEdge(cv, [{ x: 0, y: startExit.y }, { x: 0, y: startExit.y + VGAP }], { fromId: 'start', field: 'next', toId: s.next });
+  if (inf.exitPt && inf.lastId && inf.lastId !== 'end') addEdge(cv, [inf.exitPt, { x: 0, y: inf.exitPt.y + VGAP * 0.7 }], { fromId: inf.lastId, field: 'next', toId: null });
+  conns = cv.edges; labels = cv.labels; placedNodes = cv.nodes;
+  layoutBounds = { left: cv.left, top: cv.top, right: cv.right, bottom: cv.bottom };
+}
+
+/* ------------------------------ Rendering SVG ------------------------------ */
+function r1(v) { return Math.round(v * 10) / 10; }
+function textEl(t, x, y, cls) {
+  return '<text class="' + cls + '" x="' + r1(x) + '" y="' + r1(y) + '" text-anchor="middle" dominant-baseline="central">' + esc(t) + '</text>';
+}
+function nodeSvg(n) {
+  const i = n._info, w = n._w, h = n._h;
+  const cls = ['node', 'nt-' + n.type];
+  if (selectedId === n.id) cls.push('sel');
+  if (runState.activeId === n.id) cls.push('active');
+  if (runState.errorId === n.id) cls.push('error');
+  let shape = '', texts = '';
+  switch (n.type) {
+    case 'start': case 'end':
+      shape = '<rect class="shape" x="0" y="0" width="' + w + '" height="' + h + '" rx="' + (h / 2) + '"/>';
+      texts = textEl(i.main, w / 2, h / 2, 'n-main');
+      break;
+    case 'declare':
+      shape = '<rect class="shape" x="0" y="0" width="' + w + '" height="' + h + '" rx="4"/>' +
+        '<line class="stripline" x1="1" y1="' + i.strip + '" x2="' + (w - 1) + '" y2="' + i.strip + '"/>';
+      texts = textEl(i.cap, w / 2, i.strip / 2 + 1, 'n-cap') + textEl(i.main, w / 2, (i.strip + h) / 2, 'n-main');
+      break;
+    case 'assign':
+      shape = '<rect class="shape" x="0" y="0" width="' + w + '" height="' + h + '" rx="4"/>';
+      texts = textEl(i.main, w / 2, h / 2, 'n-main');
+      break;
+    case 'input':
+      shape = '<polygon class="shape" points="' + SLANT + ',0 ' + w + ',0 ' + (w - SLANT) + ',' + h + ' 0,' + h + '"/>';
+      texts = textEl(i.main, w / 2, h / 2, 'n-main');
+      break;
+    case 'output':
+      shape = '<polygon class="shape" points="0,0 ' + (w - SLANT) + ',0 ' + w + ',' + h + ' ' + SLANT + ',' + h + '"/>';
+      texts = textEl(i.main, w / 2, h / 2, 'n-main');
+      break;
+    case 'if':
+      shape = '<polygon class="shape" points="' + w / 2 + ',0 ' + w + ',' + h / 2 + ' ' + w / 2 + ',' + h + ' 0,' + h / 2 + '"/>';
+      texts = textEl(i.main, w / 2, h / 2, 'n-main');
+      break;
+    case 'while': case 'for': {
+      const hp = Math.min(HEX, Math.floor(w / 4));
+      shape = '<polygon class="shape" points="' + hp + ',0 ' + (w - hp) + ',0 ' + w + ',' + h / 2 + ' ' + (w - hp) + ',' + h + ' ' + hp + ',' + h + ' 0,' + h / 2 + '"/>';
+      if (i.sub) texts = textEl(i.main, w / 2, h / 2 - 8, 'n-main') + textEl(i.sub, w / 2, h / 2 + 12, 'n-sub');
+      else texts = textEl(i.main, w / 2, h / 2, 'n-main');
+      break;
+    }
+    default:
+      shape = '<rect class="shape" x="0" y="0" width="' + w + '" height="' + h + '" rx="4"/>';
+      texts = textEl(i.main || n.type, w / 2, h / 2, 'n-main');
+  }
+  return '<g class="' + cls.join(' ') + '" data-id="' + esc(n.id) + '" transform="translate(' + r1(n._x) + ',' + r1(n._y) + ')">' + shape + texts + '</g>';
+}
+function renderSVG() {
+  els.gEdges.innerHTML = conns.map((c, ix) => {
+    const d = c.pts.map((p, i) => (i ? 'L' : 'M') + r1(p.x) + ' ' + r1(p.y)).join(' ');
+    return '<g class="edge kind-' + c.kind + '" data-conn="' + ix + '">' +
+      '<path class="hit" d="' + d + '"/><path class="vis" d="' + d + '"' + (c.noArrow ? '' : ' marker-end="url(#ah)"') + '/></g>';
+  }).join('');
+  els.gLabels.innerHTML = labels.map(l =>
+    '<text class="blabel ' + (l.cls || '') + '" x="' + r1(l.x) + '" y="' + r1(l.y) + '" text-anchor="' + l.anchor + '">' + esc(l.text) + '</text>'
+  ).join('');
+  els.gNodes.innerHTML = placedNodes.map(nodeSvg).join('');
+}
+function renderAll() {
+  if (runState.status === 'idle') { runState.vars.clear(); runState.forState.clear(); }
+  try {
+    layoutAll();
+  } catch (e) {
+    toast('Errore diagramma: ' + e.message, 'err');
+    conns = []; labels = []; placedNodes = [];
+    layoutBounds = { left: -120, top: -80, right: 120, bottom: 80 };
+  }
+  renderSVG();
+  refreshWatch();
+}
+
+/* ------------------------------ Vista (pan e pinch-to-zoom) ------------------------------ */
+function applyView() {
+  els.gWorld.setAttribute('transform', 'translate(' + view.x + ',' + view.y + ') scale(' + view.s + ')');
+  updateGridBg();
+}
+function updateGridBg() {
+  const g = 22 * view.s;
+  els.canvasWrap.style.backgroundSize = g + 'px ' + g + 'px';
+  els.canvasWrap.style.backgroundPosition = view.x + 'px ' + view.y + 'px';
+}
+function fitView() {
+  const r = els.canvasWrap.getBoundingClientRect();
+  const b = layoutBounds || { left: -120, top: -80, right: 120, bottom: 80 };
+  const bw = Math.max(80, b.right - b.left), bh = Math.max(80, b.bottom - b.top);
+  const s = Math.min((r.width - 48) / bw, (r.height - 90) / bh, 1.15);
+  view.s = Math.max(0.2, Math.min(2.5, s));
+  view.x = r.width / 2 - (b.left + b.right) / 2 * view.s;
+  view.y = Math.max(48, (r.height - 30) / 2 - (b.top + b.bottom) / 2 * view.s);
+  applyView();
+}
+function zoomAt(sx, sy, factor) {
+  const ns = Math.max(0.2, Math.min(3, view.s * factor));
+  const k = ns / view.s;
+  view.x = sx - (sx - view.x) * k;
+  view.y = sy - (sy - view.y) * k;
+  view.s = ns;
+  applyView();
+}
+
+/* ------------------------------ Toast ------------------------------ */
+let toastTimer = null;
+function toast(msg, kind) {
+  els.toast.textContent = msg;
+  els.toast.className = kind || '';
+  els.toast.hidden = false;
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { els.toast.hidden = true; }, 2800);
+}
+
+/* ------------------------------ Bottom Sheet (Inserisci blocco) ------------------------------ */
+function closeMenus() { els.sheetBackdrop.hidden = true; els.ctxMenu.innerHTML = ''; }
+function openInsertMenu(ctx) {
+  const order = ['declare', 'assign', 'input', 'output', 'if', 'while', 'for'];
+  const html = '<div class="menu-title">Inserisci un blocco</div><div class="ins-grid">' +
+    order.map(t => '<div class="ins-item" data-type="' + t + '">' + SWATCH[t] + '<span>' + esc(TYPE_META[t].label) + '</span></div>').join('') +
+    '</div>';
+  els.ctxMenu.innerHTML = html;
+  els.sheetBackdrop.hidden = false;
+  els.ctxMenu.querySelectorAll('.ins-item').forEach(it => {
+    it.addEventListener('click', () => {
+      const t = it.dataset.type;
+      closeMenus();
+      openEditor('insert', t, null, ctx);
+    });
+  });
+}
+
+/* ------------------------------ Finestra modale ------------------------------ */
+function closeModal() { els.modalBackdrop.hidden = true; els.modal.innerHTML = ''; modalState = null; }
+function openModalHtml(html) {
+  els.modal.innerHTML = html;
+  els.modalBackdrop.hidden = false;
+}
+
+const EDITOR_FIELDS = {
+  declare: [
+    { key: 'name', label: 'Nome o elenco variabili', type: 'text', ph: 'es. x   oppure   x, somma, i', hint: 'Separa più variabili con la virgola.' },
+    { key: 'varType', label: 'Tipo di dato', type: 'select', options: [['Integer', 'Intero (numeri interi)'], ['Real', 'Reale (con virgola)'], ['String', 'Stringa (testo)'], ['Boolean', 'Booleano (vero / falso)']] },
+    { key: 'isArray', label: 'È un array (vettore)', type: 'check', hint: 'Si usa con vett[indice] partendo da 0.' },
+    { key: 'size', label: 'Numero di elementi', type: 'number', min: 1, max: MAX_ARRAY, showIf: v => v.isArray === true },
+  ],
+  assign: [
+    { key: 'var', label: 'Variabile di destinazione', type: 'text', ph: 'es. x   oppure   vett[i]' },
+    { key: 'expr', label: 'Espressione', type: 'textarea', ph: 'es. x * 2 + 1   oppure   "Ciao " + nome' },
+  ],
+  input: [
+    { key: 'var', label: 'Variabile in cui salvare il valore', type: 'text', ph: 'es. x   oppure   vett[i]' },
+  ],
+  output: [
+    { key: 'expr', label: 'Testo o espressione da stampare', type: 'textarea', ph: 'es. "Risultato: " + x' },
+    { key: 'newline', label: 'Vai a capo dopo la stampa', type: 'check' },
+  ],
+  if: [{ key: 'cond', label: 'Condizione (booleana)', type: 'text', ph: 'es. x > 0 && x != 100' }],
+  while: [{ key: 'cond', label: 'Condizione (booleana)', type: 'text', ph: 'es. i <= n' }],
+  for: [
+    { key: 'var', label: 'Variabile contatore', type: 'text', ph: 'es. i' },
+    { key: 'from', label: 'Valore iniziale', type: 'text', ph: 'es. 0' },
+    { key: 'to', label: 'Valore finale', type: 'text', ph: 'es. 10' },
+    { key: 'step', label: 'Passo (incremento)', type: 'text', ph: 'es. 1 (negativo per scendere)' },
+  ],
+};
+
+function fieldsHtml(type, values) {
+  return EDITOR_FIELDS[type].map(f => {
+    if (f.showIf && !f.showIf(values)) return '';
+    const v = values ? values[f.key] : undefined;
+    let input;
+    if (f.type === 'check') {
+      input = '<label class="f-check"><input type="checkbox" data-key="' + f.key + '"' + (v ? ' checked' : '') + '><span>' + esc(f.label) + '</span></label>';
+    } else if (f.type === 'select') {
+      input = '<select class="f-input" data-key="' + f.key + '">' + f.options.map(o =>
+        '<option value="' + o[0] + '"' + (v === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>').join('') + '</select>';
+    } else if (f.type === 'textarea') {
+      input = '<textarea class="f-input" rows="2" autocapitalize="off" autocorrect="off" spellcheck="false" data-key="' + f.key + '" placeholder="' + esc(f.ph || '') + '">' + esc(v != null ? v : '') + '</textarea>';
+    } else if (f.type === 'number') {
+      input = '<input class="f-input" type="number" inputmode="numeric" data-key="' + f.key + '" min="' + f.min + '" max="' + f.max + '" value="' + (v != null ? v : '') + '">';
+    } else {
+      input = '<input class="f-input" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" data-key="' + f.key + '" value="' + esc(v != null ? v : '') + '" placeholder="' + esc(f.ph || '') + '">';
+    }
+    const lab = f.type === 'check' ? '' : '<label class="f-label">' + esc(f.label) + '</label>';
+    return '<div class="f-row">' + lab + input + (f.hint ? '<div class="f-hint">' + esc(f.hint) + '</div>' : '') + '</div>';
+  }).join('');
+}
+function readValues(type) {
+  const vals = {};
+  for (const f of EDITOR_FIELDS[type]) {
+    const el = els.modal.querySelector('[data-key="' + f.key + '"]');
+    if (!el) continue;
+    if (f.type === 'check') vals[f.key] = el.checked;
+    else if (f.type === 'number') vals[f.key] = parseInt(el.value, 10);
+    else vals[f.key] = el.value.trim();
+  }
+  return vals;
+}
+function applyValues(node, type, vals) {
+  for (const f of EDITOR_FIELDS[type]) {
+    if (Object.prototype.hasOwnProperty.call(vals, f.key)) node[f.key] = vals[f.key];
+  }
+}
+function validateNodeForm(type, vals, selfId) {
+  switch (type) {
+    case 'declare': {
+      const names = parseVarList(vals.name);
+      if (!names.length) throw new FlowError('Inserisci almeno un nome di variabile.');
+      const seenInForm = new Set();
+      for (const name of names) {
+        if (!isIdent(name)) throw new FlowError('Nome non valido: "' + name + '"');
+        if (reservedName(name)) throw new FlowError('Il nome "' + name + '" è riservato.');
+        const k = nrm(name);
+        if (seenInForm.has(k)) throw new FlowError('Nome "' + name + '" duplicato.');
+        seenInForm.add(k);
+      }
+      if (vals.isArray && !(Number.isInteger(vals.size) && vals.size >= 1 && vals.size <= MAX_ARRAY))
+        throw new FlowError('La dimensione deve essere tra 1 e ' + MAX_ARRAY + '.');
+      for (const n of reachableNodes()) {
+        if (n.type === 'declare' && n.id !== selfId) {
+          for (const on of parseVarList(n.name)) {
+            if (seenInForm.has(nrm(on))) throw new FlowError('Variabile "' + on + '" già dichiarata.');
+          }
+        }
+      }
+      break;
+    }
+    case 'assign': parseTarget(vals.var); parseExpr(vals.expr); break;
+    case 'input': parseTarget(vals.var); break;
+    case 'output': parseExpr(vals.expr); break;
+    case 'if': case 'while': parseExpr(vals.cond); break;
+    case 'for':
+      if (!isIdent(vals.var)) throw new FlowError('Contatore non valido: "' + vals.var + '"');
+      parseExpr(vals.from); parseExpr(vals.to); parseExpr(vals.step);
+      break;
+  }
+}
+function openEditor(mode, type, editId, insertCtx) {
+  const base = mode === 'edit' ? Object.assign({}, defaultsFor(type), doc.nodes[editId]) : defaultsFor(type);
+  modalState = { mode, type, editId, insertCtx, values: base };
+  const title = mode === 'edit' ? 'Modifica: ' + TYPE_META[type].label : 'Nuovo: ' + TYPE_META[type].label;
+  const html =
+    '<div class="modal-head">' + (SWATCH[type] || '') + '<span>' + esc(title) + '</span></div>' +
+    '<div class="modal-body" id="modalFields">' + fieldsHtml(type, base) + '</div>' +
+    '<div class="f-error" id="modalError" hidden></div>' +
+    '<div class="modal-foot"><button class="btn" id="mCancel">Annulla</button>' +
+    '<button class="btn primary" id="mOk">' + (mode === 'edit' ? 'Salva' : 'Inserisci') + '</button></div>';
+  openModalHtml(html);
+  els.modal.querySelector('#mCancel').addEventListener('click', closeModal);
+  els.modal.querySelector('#mOk').addEventListener('click', editorOk);
+  els.modal.querySelector('#modalFields').addEventListener('change', e => {
+    if (e.target && e.target.type === 'checkbox') {
+      modalState.values = Object.assign({}, modalState.values, readValues(type));
+      els.modal.querySelector('#modalFields').innerHTML = fieldsHtml(type, modalState.values);
+    }
+  });
+}
+function editorOk() {
+  const st = modalState;
+  if (!st) return;
+  const vals = Object.assign({}, st.values, readValues(st.type));
+  if (st.type === 'declare' && vals.name) vals.name = parseVarList(vals.name).join(', ');
+  try {
+    validateNodeForm(st.type, vals, st.editId);
+  } catch (err) {
+    const er = els.modal.querySelector('#modalError');
+    er.hidden = false; er.textContent = err.message;
+    return;
+  }
+  const id = st.mode === 'edit' ? st.editId : insertNodeAt(st.type, st.insertCtx);
+  applyValues(doc.nodes[id], st.type, vals);
+  closeModal();
+  selectNode(null);
+  renderAll();
+  lintDiagram();
+}
+function openConfirm(title, msg, okLabel, cb, danger) {
+  modalState = { confirm: true };
+  const html =
+    '<div class="modal-head"><span>' + esc(title) + '</span></div>' +
+    '<div class="modal-body"><div class="confirm-msg">' + esc(msg) + '</div></div>' +
+    '<div class="modal-foot"><button class="btn" id="mCancel">Annulla</button>' +
+    '<button class="btn ' + (danger ? 'danger' : 'primary') + '" id="mOk">' + esc(okLabel) + '</button></div>';
+  openModalHtml(html);
+  els.modal.querySelector('#mCancel').addEventListener('click', closeModal);
+  els.modal.querySelector('#mOk').addEventListener('click', () => { closeModal(); cb(); });
+}
+
+/* ------------------------------ Generatore C++ ------------------------------ */
+function cppExpr(src) {
+  let out = String(src || '').replace(/\bvero\b/gi, 'true').replace(/\bfalso\b/gi, 'false')
+    .replace(/\band\b/gi, '&&').replace(/\bor\b/gi, '||').replace(/\bnot\b/gi, '!')
+    .replace(/\bPi\b/g, 'M_PI').replace(/\bE\b/g, 'M_E');
+  out = out.replace(/([A-Za-z_]\w*|\d+(?:\.\d+)?|\([^()]*\))\s*\^\s*([A-Za-z_]\w*|\d+(?:\.\d+)?|\([^()]*\))/g, 'pow($1, $2)');
+  return out;
+}
+function generateCpp() {
+  const lines = ['#include <iostream>', '#include <string>', '#include <cmath>', '', 'using namespace std;', '', 'int main() {'];
+  const indent = level => '    '.repeat(level);
+  const emitted = new Set();
+
+  function emitChain(firstId, level, stopId) {
+    let id = firstId, guard = 0;
+    while (id && id !== 'end' && id !== stopId && guard++ < 1000) {
+      const n = doc.nodes[id];
+      if (!n || emitted.has(id)) break;
+      emitted.add(id);
+      const p = indent(level);
+      if (n.type === 'declare') {
+        const names = parseVarList(n.name);
+        const type = ({ Integer: 'int', Real: 'double', String: 'string', Boolean: 'bool' })[n.varType] || 'int';
+        names.forEach(name => {
+          if (!isIdent(name)) return;
+          if (n.isArray) lines.push(p + type + ' ' + name + '[' + Math.max(1, Number(n.size) || 1) + ']{};');
+          else lines.push(p + type + ' ' + name + '{};');
+        });
+      } else if (n.type === 'assign') {
+        lines.push(p + cppExpr(n.var) + ' = ' + cppExpr(n.expr) + ';');
+      } else if (n.type === 'input') {
+        lines.push(p + 'cin >> ' + cppExpr(n.var) + ';');
+      } else if (n.type === 'output') {
+        lines.push(p + 'cout << ' + cppExpr(n.expr) + (n.newline ? ' << endl;' : ';'));
+      } else if (n.type === 'if') {
+        lines.push(p + 'if (' + cppExpr(n.cond) + ') {');
+        emitChain(n.trueNext, level + 1, n.next || stopId);
+        if (n.falseNext) {
+          lines.push(p + '} else {');
+          emitChain(n.falseNext, level + 1, n.next || stopId);
+        }
+        lines.push(p + '}');
+      } else if (n.type === 'while') {
+        lines.push(p + 'while (' + cppExpr(n.cond) + ') {');
+        emitChain(n.body, level + 1, id);
+        lines.push(p + '}');
+      } else if (n.type === 'for') {
+        const step = cppExpr(n.step || '1');
+        const op = /^-/.test(step) ? '>=' : '<=';
+        const cmp = step === '1' ? '<=' : (step === '-1' ? '>=' : op);
+        const update = step === '1' ? '++' + n.var : (step === '-1' ? '--' + n.var : n.var + ' += ' + step);
+        lines.push(p + 'for (' + n.var + ' = ' + cppExpr(n.from) + '; ' + n.var + ' ' + cmp + ' ' + cppExpr(n.to) + '; ' + update + ') {');
+        emitChain(n.body, level + 1, id);
+        lines.push(p + '}');
+      }
+      id = n.next;
+    }
+  }
+  try {
+    emitChain(doc.nodes.start && doc.nodes.start.next, 1, 'end');
+    lines.push('    return 0;', '}');
+    return lines.join('\n');
+  } catch (err) {
+    return '// Errore generazione C++: ' + err.message;
+  }
+}
+function openCpp() {
+  const code = generateCpp();
+  const html =
+    '<div class="modal-head"><span>Codice C++ generato</span></div>' +
+    '<div class="modal-body">' +
+      '<textarea id="cppCode" class="f-input" spellcheck="false" style="font-family:ui-monospace,Menlo,monospace;font-size:13px;min-height:260px;white-space:pre;" readonly></textarea>' +
+    '</div>' +
+    '<div class="modal-foot"><button class="btn" id="cppCopy">Copia</button><button class="btn primary" id="mOk">Chiudi</button></div>';
+  openModalHtml(html);
+  els.modal.querySelector('#cppCode').value = code;
+  els.modal.querySelector('#cppCopy').addEventListener('click', async () => {
+    const area = els.modal.querySelector('#cppCode');
+    try {
+      await navigator.clipboard.writeText(area.value);
+      toast('Codice C++ copiato negli appunti!');
+    } catch (e) {
+      area.focus(); area.select();
+      toast('Seleziona il testo e tocca Copia.', 'warn');
+    }
+  });
+  els.modal.querySelector('#mOk').addEventListener('click', closeModal);
+}
+
+function openGuide() {
+  const blockOrder = ['start', 'declare', 'assign', 'input', 'output', 'if', 'while', 'for', 'end'];
+  const blocks = blockOrder.map(t =>
+    '<div class="g-block">' + (SWATCH[t] || '') + '<b>' + esc(TYPE_META[t].label) + '</b><span>' + esc(TYPE_META[t].desc) + '</span></div>'
+  ).join('');
+  const funcs = FUNC_INFO.map(f => '<tr><td><code>' + esc(f[0]) + '</code></td><td>' + esc(f[1]) + '</td></tr>').join('');
+  const html =
+    '<div class="modal-head"><span>Guida rapida iPhone</span></div>' +
+    '<div class="modal-body">' +
+      '<div class="g-sec"><h4>Controlli Touch</h4><ul>' +
+        '<li><b>Tocca una freccia</b> tra due blocchi per inserire una nuova istruzione.</li>' +
+        '<li><b>Tocca un blocco</b> per selezionarlo e usare i pulsanti <b>Modifica</b> o <b>Elimina</b> in basso (oppure fai doppio tap sul blocco).</li>' +
+        '<li><b>Trascina con un dito</b> per spostarti sul diagramma; <b>pizzica con due dita</b> per fare zoom.</li>' +
+        '<li>Usa la barra in basso per passare tra <b>Diagramma</b>, <b>Console</b> e <b>Variabili</b>.</li>' +
+      '</ul></div>' +
+      '<div class="g-sec"><h4>Blocchi</h4>' + blocks + '</div>' +
+      '<div class="g-sec"><h4>Operatori</h4><table>' +
+        '<tr><th>Tipo</th><th>Sintassi</th></tr>' +
+        '<tr><td>Aritmetici</td><td><code>+ - * / % ^</code></td></tr>' +
+        '<tr><td>Confronto</td><td><code>== != &lt; &gt; &lt;= &gt;=</code></td></tr>' +
+        '<tr><td>Logici</td><td><code>&amp;&amp; || !</code> o <code>and or not</code></td></tr>' +
+        '<tr><td>Valori</td><td><code>42</code>, <code>3.14</code>, <code>"testo"</code>, <code>vero/falso</code></td></tr>' +
+      '</table></div>' +
+      '<div class="g-sec"><h4>Funzioni predefinite</h4><table>' + funcs + '</table></div>' +
+    '</div>' +
+    '<div class="modal-foot"><button class="btn primary" id="mOk">Chiudi</button></div>';
+  openModalHtml(html);
+  els.modal.querySelector('#mOk').addEventListener('click', closeModal);
+}
+
+/* ------------------------------ Selezione Blocchi ------------------------------ */
+function selectNode(id) {
+  if (selectedId) { const el = nodeEl(selectedId); if (el) el.classList.remove('sel'); }
+  selectedId = id;
+  if (id && doc.nodes[id] && id !== 'start' && id !== 'end') {
+    const el = nodeEl(id);
+    if (el) el.classList.add('sel');
+    els.nabTitle.textContent = TYPE_META[doc.nodes[id].type].label;
+    els.nodeActionBar.hidden = false;
+  } else {
+    els.nodeActionBar.hidden = true;
+  }
+}
+function editLocked() {
+  if (runState.status === 'running' || runState.status === 'paused' || runState.status === 'waiting') {
+    toast('Ferma il programma (Stop) per modificare.', 'warn');
+    return true;
+  }
+  return false;
+}
+function requestDelete(id) {
+  if (!id || id === 'start' || id === 'end') return;
+  if (editLocked()) return;
+  const sub = collectSubtree(id);
+  const finish = () => { deleteNodeById(id); renderAll(); toast('Blocco eliminato.'); };
+  if (sub.length > 1) {
+    openConfirm('Elimina blocco',
+      'Questo blocco contiene ' + (sub.length - 1) + ' blocchi interni che verranno eliminati. Continuare?',
+      'Elimina tutto', finish, true);
+  } else finish();
+}
+
+/* ------------------------------ Eventi Touch, Pinch-to-Zoom e Click ------------------------------ */
+function bindEvents() {
+  // Tab bar inferiore
+  document.querySelectorAll('.tab-item').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
+  // Barra azioni nodo selezionato
+  els.nabEdit.addEventListener('click', () => {
+    if (!selectedId || editLocked()) return;
+    openEditor('edit', doc.nodes[selectedId].type, selectedId);
+  });
+  els.nabDel.addEventListener('click', () => {
+    if (selectedId) requestDelete(selectedId);
+  });
+
+  // Tap e Double-Tap sui nodi
+  let lastTapTime = 0, lastTapId = null;
+  els.gNodes.addEventListener('click', e => {
+    const g = e.target.closest('g.node');
+    if (!g) return;
+    const id = g.dataset.id;
+    const now = Date.now();
+    if (id === lastTapId && (now - lastTapTime) < 350) {
+      // Doppio tap -> modifica diretta
+      lastTapTime = 0;
+      if (id === 'start' || id === 'end') { toast('Blocco fisso del programma.'); return; }
+      if (!editLocked()) openEditor('edit', doc.nodes[id].type, id);
+      return;
+    }
+    lastTapTime = now; lastTapId = id;
+    if (id === 'start' || id === 'end') {
+      selectNode(null);
+      toast('Blocco fisso: ' + TYPE_META[doc.nodes[id].type].label);
+    } else {
+      selectNode(id);
+    }
+  });
+
+  // Tap sulle frecce -> apre menu inserimento blocco
+  els.gEdges.addEventListener('click', e => {
+    const g = e.target.closest('g.edge');
+    if (!g) return;
+    const c = conns[+g.dataset.conn];
+    if (!c || editLocked()) return;
+    selectNode(null);
+    openInsertMenu(c.ctx);
+  });
+
+  // Gestione Touch (Pan a 1 dito + Pinch-to-Zoom a 2 dita)
+  let touchMode = null; // 'pan' | 'pinch'
+  let panStart = null;
+  let pinchStart = null;
+
+  els.canvas.addEventListener('touchstart', e => {
+    if (e.touches.length === 1) {
+      if (e.target.closest('g.node') || e.target.closest('g.edge')) return;
+      touchMode = 'pan';
+      panStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, vx: view.x, vy: view.y, moved: false };
+    } else if (e.touches.length === 2) {
+      touchMode = 'pinch';
+      const t0 = e.touches[0], t1 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY);
+      const r = els.canvas.getBoundingClientRect();
+      pinchStart = {
+        dist,
+        s: view.s,
+        vx: view.x,
+        vy: view.y,
+        cx: (t0.clientX + t1.clientX) / 2 - r.left,
+        cy: (t0.clientY + t1.clientY) / 2 - r.top
+      };
+    }
+  }, { passive: true });
+
+  els.canvas.addEventListener('touchmove', e => {
+    if (touchMode === 'pan' && e.touches.length === 1 && panStart) {
+      const dx = e.touches[0].clientX - panStart.x;
+      const dy = e.touches[0].clientY - panStart.y;
+      if (Math.abs(dx) + Math.abs(dy) > 4) panStart.moved = true;
+      if (panStart.moved) {
+        view.x = panStart.vx + dx;
+        view.y = panStart.vy + dy;
+        applyView();
+      }
+    } else if (touchMode === 'pinch' && e.touches.length === 2 && pinchStart) {
+      const t0 = e.touches[0], t1 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY);
+      const scaleFactor = dist / pinchStart.dist;
+      const ns = Math.max(0.2, Math.min(3, pinchStart.s * scaleFactor));
+      const k = ns / pinchStart.s;
+      view.x = pinchStart.cx - (pinchStart.cx - pinchStart.vx) * k;
+      view.y = pinchStart.cy - (pinchStart.cy - pinchStart.vy) * k;
+      view.s = ns;
+      applyView();
+    }
+  }, { passive: true });
+
+  els.canvas.addEventListener('touchend', e => {
+    if (touchMode === 'pan' && panStart && !panStart.moved && e.touches.length === 0) {
+      selectNode(null);
+    }
+    if (e.touches.length === 0) {
+      touchMode = null; panStart = null; pinchStart = null;
+    }
+  });
+
+  // Fallback mouse per test su desktop
+  let mousePan = null;
+  els.canvas.addEventListener('mousedown', e => {
+    if (e.target.closest('g.node') || e.target.closest('g.edge') || e.button !== 0) return;
+    mousePan = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: false };
+  });
+  window.addEventListener('mousemove', e => {
+    if (!mousePan) return;
+    const dx = e.clientX - mousePan.x, dy = e.clientY - mousePan.y;
+    if (Math.abs(dx) + Math.abs(dy) > 3) mousePan.moved = true;
+    if (mousePan.moved) { view.x = mousePan.vx + dx; view.y = mousePan.vy + dy; applyView(); }
+  });
+  window.addEventListener('mouseup', () => {
+    if (mousePan && !mousePan.moved) selectNode(null);
+    mousePan = null;
+  });
+
+  // Chiusura bottom sheet e modali
+  els.sheetBackdrop.addEventListener('click', e => { if (e.target === els.sheetBackdrop) closeMenus(); });
+  els.modalBackdrop.addEventListener('click', e => { if (e.target === els.modalBackdrop) closeModal(); });
+
+  // Form Console Input
+  els.consoleForm.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!inputWait) return;
+    const raw = els.consoleInput.value;
+    els.consoleInput.value = '';
+    if (!raw.trim()) {
+      appendConsole('err', 'Valore vuoto: scrivi qualcosa.');
+      els.consoleInput.focus();
+      return;
+    }
+    const w = inputWait;
+    inputWait = null;
+    deactivateInput();
+    w.resolve({ raw });
+  });
+
+  // Pulsanti Toolbar
+  els.btnPlay.addEventListener('click', () => {
+    const s = runState.status;
+    if (s === 'running') { runState.mode = 'pause'; return; }
+    if (s === 'paused') { runState.mode = 'run'; if (proceedResolve) proceedResolve(); return; }
+    if (s === 'idle') startExecution('run');
+  });
+  els.btnStep.addEventListener('click', () => {
+    const s = runState.status;
+    if (s === 'idle') { startExecution('step'); return; }
+    if (s === 'paused') { runState.mode = 'step'; if (proceedResolve) proceedResolve(); }
+  });
+  els.btnStop.addEventListener('click', () => { if (runState.status !== 'idle') abortRun(); });
+
+  els.btnNew.addEventListener('click', () => {
+    if (editLocked()) return;
+    openConfirm('Nuovo diagramma', 'Vuoi cancellare il diagramma attuale e crearne uno vuoto?', 'Nuovo', () => {
+      doc = createEmptyDoc(); selectNode(null); runState.errorId = null;
+      renderAll(); fitView(); clearConsole();
+      appendConsole('sys', 'Nuovo diagramma creato.');
+    });
+  });
+  els.btnExample.addEventListener('click', () => {
+    if (editLocked()) return;
+    openConfirm('Carica esempio', 'Sostituire il diagramma con l\'esempio (somma da 1 a n)?', 'Carica', () => {
+      doc = exampleDoc(); selectNode(null); runState.errorId = null;
+      renderAll(); fitView(); clearConsole();
+      appendConsole('sys', 'Esempio caricato: premi Esegui.');
+    });
+  });
+  els.btnExport.addEventListener('click', exportJson);
+  els.btnImport.addEventListener('click', () => { if (!editLocked()) els.fileInput.click(); });
+  els.btnCpp.addEventListener('click', openCpp);
+  els.btnGuide.addEventListener('click', openGuide);
+  els.btnClearConsole.addEventListener('click', clearConsole);
+  els.speedRange.addEventListener('input', () => {
+    els.speedLabel.textContent = SPEED_NAMES[+els.speedRange.value] || '';
+  });
+  els.zoomIn.addEventListener('click', () => { const r = els.canvasWrap.getBoundingClientRect(); zoomAt(r.width / 2, r.height / 2, 1.25); });
+  els.zoomOut.addEventListener('click', () => { const r = els.canvasWrap.getBoundingClientRect(); zoomAt(r.width / 2, r.height / 2, 0.8); });
+  els.zoomFit.addEventListener('click', fitView);
+
+  els.fileInput.addEventListener('change', () => {
+    const f = els.fileInput.files && els.fileInput.files[0];
+    els.fileInput.value = '';
+    if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      try {
+        const validated = validateDoc(JSON.parse(rd.result));
+        openConfirm('Importa file', 'Sostituire il diagramma attuale con il file selezionato?', 'Importa', () => {
+          doc = validated; selectNode(null); runState.errorId = null;
+          renderAll(); fitView();
+          toast('Diagramma importato!');
+        });
+      } catch (err) {
+        toast('Errore file: ' + err.message, 'err');
+      }
+    };
+    rd.readAsText(f);
+  });
+}
+
+/* ------------------------------ Esporta / Importa JSON ------------------------------ */
+function exportJson() {
+  const PARAMS = {
+    declare: ['name', 'varType', 'isArray', 'size'],
+    assign: ['var', 'expr'],
+    input: ['var'],
+    output: ['expr', 'newline'],
+    if: ['cond'],
+    while: ['cond'],
+    for: ['var', 'from', 'to', 'step'],
+  };
+  const out = { app: 'flowgorithm-web', version: 1, nextId: doc.nextId, nodes: {} };
+  for (const id of Object.keys(doc.nodes)) {
+    const n = doc.nodes[id];
+    const c = { id: n.id, type: n.type };
+    if (n.next) c.next = n.next;
+    if (n.type === 'if') { if (n.trueNext) c.trueNext = n.trueNext; if (n.falseNext) c.falseNext = n.falseNext; }
+    if (n.type === 'while' || n.type === 'for') { if (n.body) c.body = n.body; }
+    for (const k of (PARAMS[n.type] || [])) c[k] = n[k];
+    out.nodes[id] = c;
+  }
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'diagramma-flowgorithm.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  toast('File JSON scaricato!');
+}
+
+function validateDoc(data) {
+  const fail = m => { throw new FlowError(m); };
+  if (!data || typeof data !== 'object' || !data.nodes || typeof data.nodes !== 'object') fail('File non valido');
+  const src = data.nodes;
+  if (!src.start || !src.end) fail('Mancano i blocchi start/end');
+  if (Object.keys(src).length > MAX_NODES + 2) fail('Troppi blocchi');
+  const nodes = {};
+  const refOk = v => typeof v === 'string' && v && v !== 'start' && src[v];
+  for (const id of Object.keys(src)) {
+    const sn = src[id] || {};
+    let type = id === 'start' ? 'start' : (id === 'end' ? 'end' : sn.type);
+    if (!TYPE_META[type]) fail('Blocco sconosciuto: ' + sn.type);
+    const n = { id, type };
+    if (refOk(sn.next) && sn.next !== id) n.next = sn.next;
+    if (type === 'if') {
+      if (refOk(sn.trueNext) && sn.trueNext !== id) n.trueNext = sn.trueNext;
+      if (refOk(sn.falseNext) && sn.falseNext !== id) n.falseNext = sn.falseNext;
+    }
+    if ((type === 'while' || type === 'for') && refOk(sn.body) && sn.body !== id) n.body = sn.body;
+    switch (type) {
+      case 'start': n.next = (!n.next || n.next === 'start') ? 'end' : n.next; break;
+      case 'end': n.next = null; break;
+      case 'declare':
+        n.name = String(sn.name != null ? sn.name : 'x');
+        n.varType = VAR_TYPES[sn.varType] ? sn.varType : 'Integer';
+        n.isArray = !!sn.isArray;
+        n.size = Math.max(1, Math.min(MAX_ARRAY, parseInt(sn.size, 10) || 1));
+        break;
+      case 'assign': n.var = String(sn.var != null ? sn.var : 'x'); n.expr = String(sn.expr != null ? sn.expr : '0'); break;
+      case 'input': n.var = String(sn.var != null ? sn.var : 'x'); break;
+      case 'output': n.expr = String(sn.expr != null ? sn.expr : '""'); n.newline = sn.newline !== false; break;
+      case 'if': case 'while': n.cond = String(sn.cond != null ? sn.cond : 'vero'); break;
+      case 'for':
+        n.var = String(sn.var != null ? sn.var : 'i');
+        n.from = String(sn.from != null ? sn.from : '0');
+        n.to = String(sn.to != null ? sn.to : '10');
+        n.step = String(sn.step != null ? sn.step : '1');
+        break;
+    }
+    nodes[id] = n;
+  }
+  nodes.start.next = nodes[nodes.start.next] ? nodes.start.next : 'end';
+  nodes.end.next = null;
+  computeContinuations(nodes);
+  let nextId = 1;
+  for (const id of Object.keys(nodes)) {
+    const m = /^n(\d+)$/.exec(id);
+    if (m) nextId = Math.max(nextId, Number(m[1]) + 1);
+  }
+  return { nextId, nodes };
+}
+
+/* ------------------------------ Avvio ------------------------------ */
+function init() {
+  grabEls();
+  injectFontStyle();
+  bindEvents();
+  els.zoomFit.innerHTML = ICONS.fit;
+  els.speedLabel.textContent = SPEED_NAMES[+els.speedRange.value] || '';
+  deactivateInput();
+  doc = exampleDoc();
+  renderAll();
+  fitView();
+  refreshToolbar();
+  appendConsole('sys', 'Benvenuto! Diagramma di esempio caricato. Premi Esegui per avviarlo.');
+}
+init();
+</script>
+</body>
+</html>
